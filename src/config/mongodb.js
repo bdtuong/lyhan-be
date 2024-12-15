@@ -1,10 +1,9 @@
 // minhnguyencong333
 // u4aFxfr2IJAgzStQ
-
+ 
 
 // Replace the placeholders in the connection string uri with your credentials
 const MONGODB_URI = 'mongodb+srv://minhnguyencong333:u4aFxfr2IJAgzStQ@scout-codesharing.qr0ar.mongodb.net/?retryWrites=true&w=majority&appName=scout-codesharing';
-
 const DATABASE_NAME ='scout-codesharing'
 // Create a client with options to specify Stable API Version 1
 

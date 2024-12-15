@@ -1,6 +1,6 @@
 //import thư viện express
 import express from 'express'; 
-import { CONNECT_DB, GET_DB } from '~/config/mongodb';
+import { CONNECT_DB, GET_DB } from './src/config/mongodb.js';
 
 
 const START_SERVER = ()=>{
