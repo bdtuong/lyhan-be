@@ -1,6 +1,6 @@
 // minhnguyencong333
-// u4aFxfr2IJAgzStQ
- 
+// u4aFxfr2IJAgzStQ 
+
 
 // Replace the placeholders in the connection string uri with your credentials
 const MONGODB_URI = 'mongodb+srv://minhnguyencong333:u4aFxfr2IJAgzStQ@scout-codesharing.qr0ar.mongodb.net/?retryWrites=true&w=majority&appName=scout-codesharing';

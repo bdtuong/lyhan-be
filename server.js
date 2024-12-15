@@ -2,7 +2,7 @@
 import express from 'express'; 
 import exitHook from "async-exit-hook"
 import { CONNECT_DB, GET_DB, CLOSE_DB } from './src/config/mongodb.js';
-import {env} from '~config/environment'
+import { env } from './src/config/environment.js'
 
 const START_SERVER = ()=>{
   //tạo 1 app express mới
@@ -20,7 +20,7 @@ const START_SERVER = ()=>{
   });
   //Thực hiện cleanup trước khi dừng server
   exitHook((signal)=>{
-    console.log('3.Disconnecting from MongoDB Cloud Atlas...')
+    console.log('3.Server is shutting down...')
     CLOSE_DB()
     console.log('4.Disconnected from MongoDB Cloud Atlas')
   })
