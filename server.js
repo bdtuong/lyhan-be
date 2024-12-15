@@ -1,37 +1,29 @@
 //import thư viện express
 import express from 'express'; 
-import { CONNECT_DB, GET_DB } from './src/config/mongodb.js';
-
+import exitHook from "async-exit-hook"
+import { CONNECT_DB, GET_DB, CLOSE_DB } from './src/config/mongodb.js';
+import {env} from '~config/environment'
 
 const START_SERVER = ()=>{
   //tạo 1 app express mới
   const app = express(); 
 
-  //các biến lấy ra từ các biến môi trường tương ứng. Giá trị được định nghĩa trong .env
-  // eslint-disable-next-line no-undef
-  const databaseUrl = process.env.DATABASE_URL;
-  // eslint-disable-next-line no-undef
-  const apiKey = process.env.API_KEY;
-  // eslint-disable-next-line no-undef
-  const secretKey = process.env.SECRET_KEY;
 
-  //in giá trị từ biến để kiểm tra
-  console.log('Database URL:', databaseUrl);
-  console.log('API Key:', apiKey);
-  console.log('Secret Key:', secretKey);
-
-  const hostname = 'localhost'
-  const port = 8017
 
   app.get('/', async (req, res) => {
     console.log(await GET_DB().listCollections().toArray())
     res.send('Hello, scout-codesharing!');
   });   
 
-  app.listen(port, hostname, () => {
-    console.log(`Hello, We are running at http://${hostname}:${port}/`);
+  app.listen(env.APP_PORT, env.APP_HOST, () => {
+    console.log(`Hello ${env.AUTHOR}, We are running at http://${env.APP_HOST}:${env.APP_PORT}/`);
   });
-
+  //Thực hiện cleanup trước khi dừng server
+  exitHook((signal)=>{
+    console.log('3.Disconnecting from MongoDB Cloud Atlas...')
+    CLOSE_DB()
+    console.log('4.Disconnected from MongoDB Cloud Atlas')
+  })
 }
 
 
@@ -62,3 +54,4 @@ CONNECT_DB ()
     console.error(error)
     process.exit(0)
   })*/
+

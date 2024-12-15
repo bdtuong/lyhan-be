@@ -36,3 +36,8 @@ export const GET_DB = ()=> {
     if(!scoutdatabaseInstance) throw new Error('Must connect to Database first!')
     return scoutdatabaseInstance
 }
+
+//đóng kết nối tới database khi cần
+export const CLOSE_DB = async () => {
+    await mongoClientInstance.close()
+}
