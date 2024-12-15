@@ -27,4 +27,4 @@ dist-ssr
 *.sw?
 
 # .gitignore file 
-.env
+.env.example
