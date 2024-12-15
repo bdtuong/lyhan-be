@@ -29,7 +29,7 @@ const START_SERVER = ()=>{
   });   
 
   app.listen(port, hostname, () => {
-    console.log(`Hello, We are running at http://${hostname}: ${port}/`);
+    console.log(`Hello, We are running at http://${hostname}:${port}/`);
   });
 
 }
