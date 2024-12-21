@@ -3,17 +3,16 @@ import express from 'express';
 import exitHook from "async-exit-hook"
 import { CONNECT_DB, GET_DB, CLOSE_DB } from './src/config/mongodb.js';
 import { env } from './src/config/environment.js'
+import {APIs_V1} from './src/routes/v1/index.js'
 
 const START_SERVER = ()=>{
   //tạo 1 app express mới
-  const app = express(); 
+  const app = express();
 
-
-
-  app.get('/', async (req, res) => {
-    console.log(await GET_DB().listCollections().toArray())
-    res.send('Hello, scout-codesharing!');
-  });   
+  //enable red.body json data
+  app.use(express.json());
+  //use API_V1
+  app.use ('/v1', APIs_V1)
 
   app.listen(env.APP_PORT, env.APP_HOST, () => {
     console.log(`Hello ${env.AUTHOR}, We are running at http://${env.APP_HOST}:${env.APP_PORT}/`);
