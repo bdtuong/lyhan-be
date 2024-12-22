@@ -31,14 +31,12 @@ const createNew = async (req , res , next )=> {
     })
 
     try {
-        console.log(req.body)
 
         //kiểm tra dữ liệu gửi lên có phù hợp hay không?
         await correctCondition.validateAsync(req.body, {abortEarly: false})
 
-        //chuyển đến tầng controllers
-        //next()
-        res.status(StatusCodes.CREATED).json({ message: 'POST from Validation: API create new board'})
+        //Validate dữ liệu hợp lệ xong req đi tiếp sang controller
+        next()
     }   catch (error) {
         console.log(error)
         res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
