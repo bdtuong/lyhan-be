@@ -1,10 +1,10 @@
 //import thư viện express
-import express from 'express'; 
-import exitHook from "async-exit-hook"
-import { CONNECT_DB, GET_DB, CLOSE_DB } from './src/config/mongodb.js';
-import { env } from './src/config/environment.js'
-import {APIs_V1} from './src/routes/v1/index.js'
-import {errorHandlingMiddleware} from './src/middlewares/errorhandlingmiddleware.js'
+import {express} from 'express' 
+import {exitHook} from "async-exit-hook"
+import { CONNECT_DB, GET_DB, CLOSE_DB } from './config/mongodb.js'
+import { env } from './config/environment.js'
+import {APIs_V1} from './routes/v1/index.js'
+import {errorHandlingMiddleware} from './middlewares/errorhandlingmiddleware.js'
 
 const START_SERVER = ()=>{
   //tạo 1 app express mới

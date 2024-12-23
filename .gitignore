@@ -14,6 +14,9 @@ dist-ssr
 
 # Editor directories and files
 
+#production
+build
+
 
 .vscode/*
 !.vscode/setting.json
