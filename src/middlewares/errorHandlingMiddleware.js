@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
-// import { env } from '~/config/environment'
+
 
 // Middleware xử lý lỗi tập trung trong ứng dụng Back-end NodeJS (ExpressJS)
 export const errorHandlingMiddleware = (err, req, res, next) => {

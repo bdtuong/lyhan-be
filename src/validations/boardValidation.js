@@ -18,16 +18,7 @@ const createNew = async (req , res , next )=> {
             'string.min': 'description must be at least 8 characters long',
             'string.max': 'description must be at most 50 characters long',
             'string.trim': 'description must not have leading or trailing whitespace'
-        }),
-        password: Joi.string().required().min(8).max(50).trim().strict().regex(/^(?=.*[A-Za-z])(?=.*\d)/).messages({
-            'any.required': 'Password is required',
-            'string.empty': 'Password is not allowed to be empty',
-            'string.min': 'Password must be at least 8 characters long',
-            'string.max': 'Password must be at most 50 characters long',
-            'string.trim': 'Password must not have leading or trailing whitespace',
-            'string.pattern.base': 'Password must contain at least one letter and one number'
-
-        }),
+        })
 
     })
 

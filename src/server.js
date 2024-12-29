@@ -1,10 +1,10 @@
 //import thư viện express
 import express from 'express' 
 import exitHook from "async-exit-hook"
-import { CONNECT_DB, GET_DB, CLOSE_DB } from './src/config/mongodb.js'
-import { env } from './src/config/environment.js'
-import {APIs_V1} from './src/routes/v1/index.js'
-import {errorHandlingMiddleware} from './src/middlewares/errorhandlingmiddleware.js'
+import { CONNECT_DB, GET_DB, CLOSE_DB } from './config/mongodb.js'
+import { env } from './config/environment.js'
+import {APIs_V1} from './routes/v1/index.js'
+import {errorHandlingMiddleware} from './middlewares/errorhandlingmiddleware.js'
 
 const START_SERVER = ()=>{
   //tạo 1 app express mới
@@ -19,13 +19,13 @@ const START_SERVER = ()=>{
   app.use(errorHandlingMiddleware)
 
   app.listen(env.APP_PORT, env.APP_HOST, () => {
-    console.log(`Hello ${env.AUTHOR}, We are running at http://${env.APP_HOST}:${env.APP_PORT}/`);
+    console.log(`3. Hello ${env.AUTHOR}, We are running at http://${env.APP_HOST}:${env.APP_PORT}/`);
   });
   //Thực hiện cleanup trước khi dừng server
   exitHook((signal)=>{
-    console.log('3.Server is shutting down...')
+    console.log('4.Server is shutting down...')
     CLOSE_DB()
-    console.log('4.Disconnected from MongoDB Cloud Atlas')
+    console.log('5. Disconnected from MongoDB Cloud Atlas')
   })
 }
 
