@@ -16,6 +16,8 @@ const START_SERVER = ()=>{
   app.use(cors(corsOptions))
   //enable red.body json data
   app.use(express.json())
+  //enable req.body json data
+  app.use(express.json());
   //use API_V1
   app.use ('/v1', APIs_V1)
 

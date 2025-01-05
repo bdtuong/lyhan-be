@@ -22,12 +22,10 @@ const createNew = async (req, res, next) => {
 
 const getDetails = async (req, res, next) => {
     try {
-
-        //console.log('req.params:', req.params)
-        const boardId = req.params.id
+        const boardId = req.params.Id
 
         const board = await boardService.getDetails(boardId)
-
+    
         res.status(StatusCodes.OK).json(board)
     } catch (error) {
         next(error)
