@@ -5,8 +5,13 @@ import { slugify } from '../utils/formatters.js'
 
 const createNew = async (reqBody) => {
     try{
+        
         if (!reqBody || !reqBody.username) {
             throw new Error('Username is required');
+        }
+        const existingUser = await AuthModel.findOne({ userID: reqBody.userID });
+        if (existingUser) {
+            throw new ApiError(StatusCodes.CONFLICT, 'UserID already exists');
         }
         // xử lý logic dữ liệu tùy đặc thù dự án
         const newUser = {

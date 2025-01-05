@@ -1,6 +1,10 @@
 import { StatusCodes } from 'http-status-codes'
 import { AuthService } from '../services/AuthService.js'
 import { AuthModel } from '../models/AuthModel.js'
+import  ApiError  from '../utils/ApiError.js'
+import bcrypt from 'bcrypt'
+import  jwt  from 'jsonwebtoken'
+
 
 const createNew = async (req, res, next) => {
     try {
@@ -42,16 +46,16 @@ const GenerateRefreshToken = (User) => {
 
 const LoginUser = async (req, res, next) => {
     try {
-        const {UserID, Password} = req.body
+        const {userID, password} = req.body
 
         //tìm UserID
-        const User = await AuthModel.findOne({UserID})
+        const User = await AuthModel.findOne({userID})
         if(!User){
             throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
         }
 
         //so sánh Password
-        const ValidPassword = await bcrypt.compare(Password, User.Password)
+        const ValidPassword = await bcrypt.compare(password, User.password)
         if(!ValidPassword){
             throw new ApiError(StatusCodes.UNAUTHORIZED, 'Wrong Password')
         }
@@ -66,8 +70,8 @@ const LoginUser = async (req, res, next) => {
                 secure:false,//deploy lên server thì true
                 sameSite: "strict" // ngăn chặn CSRF
             })
-        const {Password, ...UserWithoutPassword} = User._docs
-        res.StatusCodes.OK.json({...UserWithoutPassword, access_token, refresh_token})
+        const {password, ...UserWithoutpassword} = User._docs
+        res.StatusCodes.OK.json({...UserWithoutpassword, access_token, refresh_token})
         }
     } catch (error) {
         next(error)
