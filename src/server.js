@@ -10,7 +10,7 @@ const START_SERVER = ()=>{
   //tạo 1 app express mới
   const app = express();
 
-  //enable red.body json data
+  //enable req.body json data
   app.use(express.json());
   //use API_V1
   app.use ('/v1', APIs_V1)
