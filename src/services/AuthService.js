@@ -1,20 +1,17 @@
 import { StatusCodes } from 'http-status-codes'
 import { AuthModel } from '../models/AuthModel.js'
 import ApiError from '../utils/ApiError.js'
-import jwt from 'jsonwebtoken'
 import { slugify } from '../utils/formatters.js'
-import bcrypt from 'bcrypt'
 
 const createNew = async (reqBody) => {
     try{
-        if (!reqBody || !reqBody.Username) {
+        if (!reqBody || !reqBody.username) {
             throw new Error('Username is required');
         }
-
         // xử lý logic dữ liệu tùy đặc thù dự án
         const newUser = {
             ...reqBody,
-            slug: slugify(reqBody.Username)
+            slug: slugify(reqBody.username)
         }
         // Gọi tầng Models để xử lý  lưu bản ghi newUser vào database
         const createdUser = await AuthModel.createNew(newUser)

@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import { AuthService } from '../services/AuthService.js'
 import { AuthModel } from '../models/AuthModel.js'
 
-const createNew = async (res, req, next) => {
+const createNew = async (req, res, next) => {
     try {
         
         //điều hướng đến tầng service
@@ -40,7 +40,7 @@ const GenerateRefreshToken = (User) => {
     )
 }
 
-const LoginUser = async (res, req, next) => {
+const LoginUser = async (req, res, next) => {
     try {
         const {UserID, Password} = req.body
 

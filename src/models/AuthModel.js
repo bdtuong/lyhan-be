@@ -2,16 +2,17 @@ import Joi from 'joi'
 import {ObjectId} from'mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 import { GET_DB } from '../config/mongodb.js'
-import bycrypt from 'bcrypt'
+import bcrypt from 'bcrypt'
 
 // Define Collection (name & schema)
 const USER_COLLECTION_NAME = 'Users'
 const USER_COLLECTION_SCHEMA = Joi.object({
-    Username: Joi.string().required(true).min(6).max(20).trim().strict(),
-    UserID: Joi.string().required(true).min(6).max(30).trim().strict(),
-    Password: Joi.string().required(true).min(8).trim().strict(),
-    Admin: Joi.boolean().default(false),
-    slug: Joi.string().required(true).trim().strict(),
+    username: Joi.string().required().min(6).max(20).trim().strict(),
+    userID: Joi.string().required().min(6).max(30).trim().strict(),
+    password: Joi.string().required().min(8).trim().strict(),
+    confirmPassword: Joi.string().required().valid(Joi.ref('password')).strict(),
+    admin: Joi.boolean().default(false),
+    slug: Joi.string().required().trim().strict(),
 
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),
@@ -24,9 +25,13 @@ const validateBeforeCreate = async (data) => {
 
 };
 
+
 const createNew = async (data) => {
     try {
         const validData = await validateBeforeCreate(data)
+        validData.password = await bcrypt.hash(validData.password, 10)
+        delete validData.confirmPassword
+
         console.log('validData: ', validData)
         const createdUser = await GET_DB().collection(USER_COLLECTION_NAME).insertOne(validData)
 
