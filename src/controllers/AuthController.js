@@ -135,7 +135,7 @@ const Logout = async (req, res) => {
 
 //(2) Lưu trữ vào Httponly Cookies (dễ bị hack CSRF -->Samesite cứu được)
 
-//(3) Redux store để lưu access token
+//(3) Redux store để lưu access_token
 //(3) Httponly Cookies để lưu refresh token
 
 //có thể xem BFF (Backend for Frontend) để xử lý vấn đề này
