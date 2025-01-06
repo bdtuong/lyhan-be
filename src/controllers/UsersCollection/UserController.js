@@ -1,6 +1,6 @@
-import {AuthModel} from '../models/AuthModel.js'
+import {AuthModel} from '../../models/AuthModel.js'
 import {StatusCodes} from 'http-status-codes'
-import { GET_DB } from '../config/mongodb.js'
+import { GET_DB } from '../../config/mongodb.js'
 import { ObjectId } from 'mongodb'
 
 

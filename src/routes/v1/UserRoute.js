@@ -1,6 +1,6 @@
 import express from 'express'
 import { StatusCodes} from 'http-status-codes'
-import { userController } from '../../controllers/UserController.js'
+import { userController } from '../../controllers/UsersCollection/UserController.js'
 
 const Router2 = express.Router()
 

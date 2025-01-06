@@ -3,6 +3,8 @@ import {ObjectId} from'mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 import { GET_DB } from '../config/mongodb.js'
 import bcrypt from 'bcrypt'
+import { boardModel } from './boardModel.js'
+import { commentModel } from './commentModel.js'
 
 // Define Collection (name & schema)
 const USER_COLLECTION_NAME = 'Users'
@@ -13,7 +15,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
     confirmPassword: Joi.string().required().valid(Joi.ref('password')).strict(),
     admin: Joi.boolean().default(false),
     slug: Joi.string().required().trim().strict(),
-
+    
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),
     _destroy: Joi.boolean().default(false)
@@ -56,10 +58,31 @@ const findOneById = async (id) => {
         throw new Error(error)
     }
 }
-
+// bat dau join data tai day
 const getDetails = async (id) => {
     try {
-        return await GET_DB().collection(USER_COLLECTION_NAME).findOne({_id: new ObjectId(id)})
+       // return await GET_DB().collection(USER_COLLECTION_NAME).findOne({_id: new ObjectId(id)})
+        const result = await GET_DB().collection(USER_COLLECTION_NAME).aggregate([
+            {$match: {
+                _id: new ObjectId(id),
+                _destroy: false
+            } },
+            {$lookup: {
+                from: boardModel.BOARD_COLLECTION_NAME,
+                localField: '_id',
+                foreignField: 'userId',
+                as: 'boards'
+            } },
+            {$lookup: {
+                from: commentModel.COMMENT_COLLECTION_NAME,
+                localField: '_id',
+                foreignField: 'userId',
+                as: 'comments'
+            } }
+        ]).toArray()
+
+        return result[0] || {}
+
     } catch (error) {
         throw new Error(error)
     }

@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
-import { AuthService } from '../services/AuthService.js'
-import { AuthModel } from '../models/AuthModel.js'
-import  ApiError  from '../utils/ApiError.js'
+import { AuthService } from '../../services/AuthService.js'
+import { AuthModel } from '../../models/AuthModel.js'
+import  ApiError  from '../../utils/ApiError.js'
 import bcrypt from 'bcrypt'
 import  jwt  from 'jsonwebtoken'
 

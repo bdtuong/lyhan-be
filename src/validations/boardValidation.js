@@ -1,6 +1,7 @@
 import Joi from 'joi'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../utils/ApiError.js'
+import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 
 const createNew = async (req , res , next )=> {
     const correctCondition = Joi.object({
@@ -18,7 +19,10 @@ const createNew = async (req , res , next )=> {
             'string.min': 'description must be at least 8 characters long',
             'string.max': 'description must be at most 50 characters long',
             'string.trim': 'description must not have leading or trailing whitespace'
-        })
+        }),
+        userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+        content: Joi.string().required()
+
 
     })
 

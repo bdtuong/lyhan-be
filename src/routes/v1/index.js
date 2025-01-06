@@ -4,6 +4,7 @@ import {boardRoute} from './boardRoute.js'
 import {AuthRoute} from './AuthRoute.js'
 import {UserRoute} from './UserRoute.js'
 
+
 const Router = express.Router()
 
 //Check APIs v1/status
@@ -19,5 +20,7 @@ Router.use('/Auth',AuthRoute)
 
 //User APIs v1/User
 Router.use('/User',UserRoute)
+
+
 
 export const APIs_V1 = Router
