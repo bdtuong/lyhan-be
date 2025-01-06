@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
-import { AuthService } from '../services/AuthService.js'
-import { AuthModel } from '../models/AuthModel.js'
-import  ApiError  from '../utils/ApiError.js'
+import { AuthService } from '../../services/AuthService.js'
+import { AuthModel } from '../../models/AuthModel.js'
+import  ApiError  from '../../utils/ApiError.js'
 import bcrypt from 'bcrypt'
 import  jwt  from 'jsonwebtoken'
 
@@ -21,13 +21,13 @@ const createNew = async (req, res, next) => {
 
 
 //khi login sẽ push refresh token vào mảng
-let refreshtokens = []
+let refresh_tokens = [1]
 
 
 const GenerateAccessToken = (User) => {
     return jwt.sign({
-        id: User.id,
-        admin: User.admin
+        id: User._id,
+        Admin: User.Admin
     },
     process.env.JWT_ACCESS_TOKEN_SECRET,
     {expiresIn: '1m'}
@@ -36,8 +36,8 @@ const GenerateAccessToken = (User) => {
 
 const GenerateRefreshToken = (User) => {
     return jwt.sign({
-        id: User.id,
-        admin: User.admin
+        id: User._id,
+        Admin: User.Admin
     },
     process.env.JWT_REFRESH_TOKEN_SECRET,
     {expiresIn: '365d'}
@@ -59,19 +59,19 @@ const LoginUser = async (req, res, next) => {
         if(!ValidPassword){
             throw new ApiError(StatusCodes.UNAUTHORIZED, 'Wrong Password')
         }
-        //đúng
         if(User && ValidPassword){
-            
+            res.status(StatusCodes.OK).json({message: 'Login success'})
             const access_token = GenerateAccessToken(User)
-            const refreshtoken = GenerateRefreshToken(User)
-            refreshtokens.push(refreshtoken)//token ở trong cookies
-            res.cookie('refreshtoken', refreshtoken, {
+            const refresh_token = GenerateRefreshToken(User)
+            refresh_tokens.push(refresh_token)
+            res.cookie('refresh_token', refresh_token, {
                 httpOnly: true,
-                path: '/refreshtoken',
+                path: '/refresh_token',
                 secure:false,//deploy lên server thì true
                 sameSite: "strict" // ngăn chặn CSRF
             })
-            res.status(StatusCodes.OK).json({message: 'Login success',User , access_token})
+        const {password, ...UserWithoutpassword} = User._docs
+        res.StatusCodes.OK.json({...UserWithoutpassword, access_token, refresh_token})
         }
     } catch (error) {
         next(error)
@@ -82,27 +82,27 @@ const LoginUser = async (req, res, next) => {
 //Reset lại access token, refresh token khi hết hạn
 const requestRefreshToken = async (req, res) => {
     //Lấy refresh token từ User
-    const refreshtoken = req.cookies.refreshtoken
-    if(!refreshtoken){
+    const refresh_token = req.cookies.refresh_token
+    if(!refresh_token){
         throw new ApiError(StatusCodes.UNAUTHORIZED, 'No refresh token')
     }
     //nếu không phải refresh token của mình thì báo lỗi
-    if(!refreshtokens.includes(refreshtoken)){
+    if(!refresh_tokens.includes(refresh_token)){
         throw new ApiError(StatusCodes.UNAUTHORIZED, 'Refresh token is not valid')
     }
-    jwt.verify(refreshtoken, process.env.JWT_REFRESH_TOKEN_SECRET, (err, User) => {
+    jwt.verify(refresh_token, process.env.JWT_REFRESH_TOKEN_SECRET, (err, User) => {
         if(err){
             throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid refresh token')
         }
         //lọc ra refresh token cũ
-        refreshtokens = refreshtokens.filter(token => token !== refreshtoken)
+        refresh_tokens = refresh_tokens.filter(token => token !== refresh_token)
         //tạo access token, refresh token mới
         const new_access_token = GenerateAccessToken(User)
-        const new_refreshtoken = GenerateRefreshToken(User)
-        refreshtokens.push(new_refreshtoken)
-        res.cookie('refreshtoken', new_refreshtoken, {
+        const new_refresh_token = GenerateRefreshToken(User)
+        refresh_tokens.push(new_refresh_token)
+        res.cookie('refresh_token', new_refresh_token, {
             httpOnly: true,
-            path: '/refreshtoken',
+            path: '/refresh_token',
             secure:false,//deploy lên server thì true
             sameSite: "strict" // ngăn chặn CSRF
         })
@@ -124,9 +124,9 @@ const getDetails = async (req, res, next) => {
 }
 
 const Logout = async (req, res) => {
-    res.clearCookie('refreshtoken')
+    res.clearCookie('refresh_token')
     //lọc ra refresh token tồn tại
-    refreshtokens = refreshtokens.filter(token => token !== req.cookies.refreshtoken)
+    refresh_tokens = refresh_tokens.filter(token => token !== req.cookies.refresh_token)
     res.status(StatusCodes.OK).json({message: 'Logout success'})
 }
 
@@ -135,7 +135,7 @@ const Logout = async (req, res) => {
 
 //(2) Lưu trữ vào Httponly Cookies (dễ bị hack CSRF -->Samesite cứu được)
 
-//(3) Redux store để lưu access_token
+//(3) Redux store để lưu access token
 //(3) Httponly Cookies để lưu refresh token
 
 //có thể xem BFF (Backend for Frontend) để xử lý vấn đề này
