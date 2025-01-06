@@ -14,6 +14,7 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
     userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     userID: Joi.required(),
     title: Joi.string().required().min(3).max(50).trim().strict(),
+    slug: Joi.string().required().trim().strict(),
   
     description: Joi.string().required().min(3).max(256).trim().strict(),
     content: Joi.string().required(),
