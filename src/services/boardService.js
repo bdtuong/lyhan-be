@@ -3,26 +3,32 @@ import { StatusCodes } from 'http-status-codes'
 import {boardModel} from '../models/boardModel.js'
 import ApiError from '../utils/ApiError.js'
 import { slugify } from '../utils/formatters.js'
-
+import { MongoClient, ObjectId } from 'mongodb'
 
 const createNew = async (reqBody) => {
     try{
         // xử lý logic dữ liệu tùy đặc thù dự án
-        const newBoard = {
+
+        const objectId = {
             ...reqBody,
-            slug: slugify(reqBody.title)
+            userID: new ObjectId(reqBody.userId)
         }
+
+
         // Gọi tầng Models để xử lý  lưu bản ghi newBoard vào database
-        const createdBoard = await boardModel.createNew(newBoard)
+
+        const createdBoar = await boardModel.createNew(objectId)
         //console.log(createdBoard)
 
         // lấy bản ghi board sau khi gọi 
-        const getNewBoard = await boardModel.findOneById(createdBoard.insertedId)
+ 
+        const getNewBoar = await boardModel.findOneById(createdBoar.insertedId)
         //console.log(getNewBoard)
         
         // trả kết quả trong service
-        return getNewBoard
+        return getNewBoar
     } 
+    
     
     catch (error) { throw error }
 }

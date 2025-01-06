@@ -70,13 +70,13 @@ const getDetails = async (id) => {
             {$lookup: {
                 from: boardModel.BOARD_COLLECTION_NAME,
                 localField: '_id',
-                foreignField: 'userId',
+                foreignField: 'userID',
                 as: 'boards'
             } },
             {$lookup: {
                 from: commentModel.COMMENT_COLLECTION_NAME,
                 localField: '_id',
-                foreignField: 'userId',
+                foreignField: 'userID',
                 as: 'comments'
             } }
         ]).toArray()
