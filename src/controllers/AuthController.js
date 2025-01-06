@@ -21,13 +21,13 @@ const createNew = async (req, res, next) => {
 
 
 //khi login sẽ push refresh token vào mảng
-let refresh_tokens = [1]
+let refreshtokens = []
 
 
 const GenerateAccessToken = (User) => {
     return jwt.sign({
-        id: User._id,
-        Admin: User.Admin
+        id: User.id,
+        admin: User.admin
     },
     process.env.JWT_ACCESS_TOKEN_SECRET,
     {expiresIn: '1m'}
@@ -36,8 +36,8 @@ const GenerateAccessToken = (User) => {
 
 const GenerateRefreshToken = (User) => {
     return jwt.sign({
-        id: User._id,
-        Admin: User.Admin
+        id: User.id,
+        admin: User.admin
     },
     process.env.JWT_REFRESH_TOKEN_SECRET,
     {expiresIn: '365d'}
@@ -59,19 +59,19 @@ const LoginUser = async (req, res, next) => {
         if(!ValidPassword){
             throw new ApiError(StatusCodes.UNAUTHORIZED, 'Wrong Password')
         }
+        //đúng
         if(User && ValidPassword){
-            res.status(StatusCodes.OK).json({message: 'Login success'})
+            
             const access_token = GenerateAccessToken(User)
-            const refresh_token = GenerateRefreshToken(User)
-            refresh_tokens.push(refresh_token)
-            res.cookie('refresh_token', refresh_token, {
+            const refreshtoken = GenerateRefreshToken(User)
+            refreshtokens.push(refreshtoken)//token ở trong cookies
+            res.cookie('refreshtoken', refreshtoken, {
                 httpOnly: true,
-                path: '/refresh_token',
+                path: '/refreshtoken',
                 secure:false,//deploy lên server thì true
                 sameSite: "strict" // ngăn chặn CSRF
             })
-        const {password, ...UserWithoutpassword} = User._docs
-        res.StatusCodes.OK.json({...UserWithoutpassword, access_token, refresh_token})
+            res.status(StatusCodes.OK).json({message: 'Login success', access_token})
         }
     } catch (error) {
         next(error)
@@ -82,27 +82,27 @@ const LoginUser = async (req, res, next) => {
 //Reset lại access token, refresh token khi hết hạn
 const requestRefreshToken = async (req, res) => {
     //Lấy refresh token từ User
-    const refresh_token = req.cookies.refresh_token
-    if(!refresh_token){
+    const refreshtoken = req.cookies.refreshtoken
+    if(!refreshtoken){
         throw new ApiError(StatusCodes.UNAUTHORIZED, 'No refresh token')
     }
     //nếu không phải refresh token của mình thì báo lỗi
-    if(!refresh_tokens.includes(refresh_token)){
+    if(!refreshtokens.includes(refreshtoken)){
         throw new ApiError(StatusCodes.UNAUTHORIZED, 'Refresh token is not valid')
     }
-    jwt.verify(refresh_token, process.env.JWT_REFRESH_TOKEN_SECRET, (err, User) => {
+    jwt.verify(refreshtoken, process.env.JWT_REFRESH_TOKEN_SECRET, (err, User) => {
         if(err){
             throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid refresh token')
         }
         //lọc ra refresh token cũ
-        refresh_tokens = refresh_tokens.filter(token => token !== refresh_token)
+        refreshtokens = refreshtokens.filter(token => token !== refreshtoken)
         //tạo access token, refresh token mới
         const new_access_token = GenerateAccessToken(User)
-        const new_refresh_token = GenerateRefreshToken(User)
-        refresh_tokens.push(new_refresh_token)
-        res.cookie('refresh_token', new_refresh_token, {
+        const new_refreshtoken = GenerateRefreshToken(User)
+        refresh_tokens.push(new_refreshtoken)
+        res.cookie('refreshtoken', new_refreshtoken, {
             httpOnly: true,
-            path: '/refresh_token',
+            path: '/refreshtoken',
             secure:false,//deploy lên server thì true
             sameSite: "strict" // ngăn chặn CSRF
         })
@@ -124,9 +124,9 @@ const getDetails = async (req, res, next) => {
 }
 
 const Logout = async (req, res) => {
-    res.clearCookie('refresh_token')
+    res.clearCookie('refreshtoken')
     //lọc ra refresh token tồn tại
-    refresh_tokens = refresh_tokens.filter(token => token !== req.cookies.refresh_token)
+    refreshtokens = refreshtokens.filter(token => token !== req.cookies.refreshtoken)
     res.status(StatusCodes.OK).json({message: 'Logout success'})
 }
 
