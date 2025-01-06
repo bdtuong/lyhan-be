@@ -25,17 +25,8 @@ const createNew = async (reqBody) => {
         //console.log(getNewBoard)
 
         //
-        const newUser = {
-            ...reqBody,
-            slug: slugify(reqBody.username)
-        }
-        // Gọi tầng Models để xử lý  lưu bản ghi newUser vào database
-        const createdUser = await AuthModel.createNew(newUser)
 
-        // lấy bản ghi User sau khi gọi 
-        const getNewUser = await AuthModel.findOneById(createdUser.insertedId)
-        // trả kết quả trong service
-        return getNewBoar, getNewUser
+        return getNewBoar
     } 
     
     
