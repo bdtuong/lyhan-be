@@ -71,7 +71,7 @@ const LoginUser = async (req, res, next) => {
                 secure:false,//deploy lên server thì true
                 sameSite: "strict" // ngăn chặn CSRF
             })
-            res.status(StatusCodes.OK).json({message: 'Login success', access_token})
+            res.status(StatusCodes.OK).json({message: 'Login success',User , access_token})
         }
     } catch (error) {
         next(error)
@@ -99,7 +99,7 @@ const requestRefreshToken = async (req, res) => {
         //tạo access token, refresh token mới
         const new_access_token = GenerateAccessToken(User)
         const new_refreshtoken = GenerateRefreshToken(User)
-        refresh_tokens.push(new_refreshtoken)
+        refreshtokens.push(new_refreshtoken)
         res.cookie('refreshtoken', new_refreshtoken, {
             httpOnly: true,
             path: '/refreshtoken',
