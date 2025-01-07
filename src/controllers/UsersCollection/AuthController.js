@@ -46,37 +46,44 @@ const GenerateRefreshToken = (User) => {
 
 const LoginUser = async (req, res, next) => {
     try {
-        const {userID, password} = req.body
+        const { userID, password: inputPassword } = req.body;
 
-        //tìm UserID
-        const User = await AuthModel.findOne({userID})
-        if(!User){
-            throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
+        // Find the user by userID
+        const User = await AuthModel.findOne({ userID });
+        if (!User) {
+            throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
         }
 
-        //so sánh Password
-        const ValidPassword = await bcrypt.compare(password, User.password)
-        if(!ValidPassword){
-            throw new ApiError(StatusCodes.UNAUTHORIZED, 'Wrong Password')
+        // Verify the password
+        const ValidPassword = await bcrypt.compare(inputPassword, User.password);
+        if (!ValidPassword) {
+            throw new ApiError(StatusCodes.UNAUTHORIZED, 'Wrong Password');
         }
-        if(User && ValidPassword){
-            res.status(StatusCodes.OK).json({message: 'Login success'})
-            const access_token = GenerateAccessToken(User)
-            const refresh_token = GenerateRefreshToken(User)
-            refresh_tokens.push(refresh_token)
-            res.cookie('refresh_token', refresh_token, {
-                httpOnly: true,
-                path: '/refresh_token',
-                secure:false,//deploy lên server thì true
-                sameSite: "strict" // ngăn chặn CSRF
-            })
-        const {password, ...UserWithoutpassword} = User._docs
-        res.StatusCodes.OK.json({...UserWithoutpassword, access_token, refresh_token})
-        }
+        const access_token = GenerateAccessToken(User);
+        const refresh_token = GenerateRefreshToken(User);
+
+        // Store the refresh token
+        refresh_tokens.push(refresh_token);
+        // Set the refresh token as a cookie
+        res.cookie('refresh_token', refresh_token, {
+            httpOnly: true,
+            path: '/refresh_token',
+            secure: false, // Set to true in production
+            sameSite: 'strict', // Prevent CSRF
+        });
+
+        // Prepare the response without exposing the user's password
+        const userData = User._doc || User; // Handle cases where _doc might be missing
+        const { password, ...UserWithoutPassword } = userData;
+        res.status(StatusCodes.OK).json({
+            ...UserWithoutPassword,
+            access_token,
+            refresh_token,
+        });
     } catch (error) {
-        next(error)
+        next(error);
     }
-}
+};
 
 
 //Reset lại access token, refresh token khi hết hạn
