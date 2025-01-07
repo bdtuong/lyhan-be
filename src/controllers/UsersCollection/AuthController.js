@@ -133,7 +133,7 @@ const getDetails = async (req, res, next) => {
 }
 
 const Logout = async (req, res) => {
-    res.clearCookie('refresh_token')
+    res.clearCookie('refreshtoken')
     //lọc ra refresh token tồn tại
     refresh_tokens = refresh_tokens.filter(token => token !== req.cookies.refreshtoken)
     res.status(StatusCodes.OK).json({message: 'Logout success'})
