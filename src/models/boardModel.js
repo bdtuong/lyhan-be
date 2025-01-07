@@ -2,7 +2,7 @@ import Joi from 'joi'
 import {ObjectId} from'mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 import { GET_DB } from '../config/mongodb.js'
-
+import { commentModel } from './commentModel.js'
 
 
 
@@ -53,7 +53,21 @@ const findOneById = async (id) => {
 // querry aggregate để lấy thông tin về columns và cards
 const getDetails = async (id) => {
     try {
-        return await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({_id: new ObjectId(id)})
+               // return await GET_DB().collection(USER_COLLECTION_NAME).findOne({_id: new ObjectId(id)})
+                const result = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate([
+                    {$match: {
+                        _id: new ObjectId(id),
+                        _destroy: false
+                    } },
+                    {$lookup: {
+                        from: commentModel.COMMENT_COLLECTION_NAME,
+                        localField: '_id',
+                        foreignField: 'boardId',
+                        as: 'comments'
+                    } }
+                ]).toArray()
+        
+                return result[0] || {}
     } catch (error) {
         throw new Error(error)
     }

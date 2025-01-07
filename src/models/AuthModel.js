@@ -4,7 +4,7 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 import { GET_DB } from '../config/mongodb.js'
 import bcrypt from 'bcrypt'
 import { boardModel } from './boardModel.js'
-import { commentModel } from './commentModel.js'
+
 
 // Define Collection (name & schema)
 const USER_COLLECTION_NAME = 'Users'
