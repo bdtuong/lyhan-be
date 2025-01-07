@@ -27,7 +27,7 @@ let refresh_tokens = [1]
 const GenerateAccessToken = (User) => {
     return jwt.sign({
         id: User._id,
-        Admin: User.Admin
+        admin: User.admin
     },
     process.env.JWT_ACCESS_TOKEN_SECRET,
     {expiresIn: '1m'}
@@ -37,7 +37,7 @@ const GenerateAccessToken = (User) => {
 const GenerateRefreshToken = (User) => {
     return jwt.sign({
         id: User._id,
-        Admin: User.Admin
+        admin: User.admin
     },
     process.env.JWT_REFRESH_TOKEN_SECRET,
     {expiresIn: '365d'}
@@ -62,14 +62,14 @@ const LoginUser = async (req, res, next) => {
 
         if(User && ValidPassword){
         const access_token = GenerateAccessToken(User);
-        const refresh_token = GenerateRefreshToken(User);
+        const refreshtoken = GenerateRefreshToken(User);
 
         // Store the refresh token
-        refresh_tokens.push(refresh_token);
+        refresh_tokens.push(refreshtoken);
         // Set the refresh token as a cookie
-        res.cookie('refresh_token', refresh_token, {
+        res.cookie('refreshtoken', refreshtoken, {
             httpOnly: true,
-            path: '/refresh_token',
+            path: '/refreshtoken',
             secure: false, // Set to true in production
             sameSite: 'strict', // Prevent CSRF
         });
@@ -91,27 +91,27 @@ const LoginUser = async (req, res, next) => {
 //Reset lại access token, refresh token khi hết hạn
 const requestRefreshToken = async (req, res) => {
     //Lấy refresh token từ User
-    const refresh_token = req.cookies.refresh_token
-    if(!refresh_token){
+    const refreshtoken = req.cookies.refreshtoken
+    if(!refreshtoken){
         throw new ApiError(StatusCodes.UNAUTHORIZED, 'No refresh token')
     }
     //nếu không phải refresh token của mình thì báo lỗi
-    if(!refresh_tokens.includes(refresh_token)){
+    if(!refresh_tokens.includes(refreshtoken)){
         throw new ApiError(StatusCodes.UNAUTHORIZED, 'Refresh token is not valid')
     }
-    jwt.verify(refresh_token, process.env.JWT_REFRESH_TOKEN_SECRET, (err, User) => {
+    jwt.verify(refreshtoken, process.env.JWT_REFRESH_TOKEN_SECRET, (err, User) => {
         if(err){
             throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid refresh token')
         }
         //lọc ra refresh token cũ
-        refresh_tokens = refresh_tokens.filter(token => token !== refresh_token)
+        refresh_tokens = refresh_tokens.filter(token => token !== refreshtoken)
         //tạo access token, refresh token mới
         const new_access_token = GenerateAccessToken(User)
-        const new_refresh_token = GenerateRefreshToken(User)
-        refresh_tokens.push(new_refresh_token)
-        res.cookie('refresh_token', new_refresh_token, {
+        const new_refreshtoken = GenerateRefreshToken(User)
+        refresh_tokens.push(new_refreshtoken)
+        res.cookie('refreshtoken', new_refreshtoken, {
             httpOnly: true,
-            path: '/refresh_token',
+            path: '/refreshtoken',
             secure:false,//deploy lên server thì true
             sameSite: "strict" // ngăn chặn CSRF
         })
@@ -135,7 +135,7 @@ const getDetails = async (req, res, next) => {
 const Logout = async (req, res) => {
     res.clearCookie('refresh_token')
     //lọc ra refresh token tồn tại
-    refresh_tokens = refresh_tokens.filter(token => token !== req.cookies.refresh_token)
+    refresh_tokens = refresh_tokens.filter(token => token !== req.cookies.refreshtoken)
     res.status(StatusCodes.OK).json({message: 'Logout success'})
 }
 

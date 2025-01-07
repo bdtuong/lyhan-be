@@ -7,11 +7,16 @@ import { CONNECT_DB, GET_DB, CLOSE_DB } from './config/mongodb.js'
 import { env } from './config/environment.js'
 import {APIs_V1} from './routes/v1/index.js'
 import {errorHandlingMiddleware} from './middlewares/errorhandlingmiddleware.js'
+import cookieParser from "cookie-parser";
 
 const START_SERVER = ()=>{
   
   //xu ly cors
   const app = express()
+
+  // Sử dụng cookie-parser để xử lý cookies
+  app.use(cookieParser());
+
 
   app.use(cors(corsOptions))
   //enable red.body json data
