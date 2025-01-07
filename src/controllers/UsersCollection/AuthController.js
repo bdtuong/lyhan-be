@@ -74,7 +74,7 @@ const LoginUser = async (req, res, next) => {
         res.StatusCodes.OK.json({...UserWithoutpassword, access_token, refresh_token})
         }
     } catch (error) {
-        return next(error)
+        next(error)
     }
 }
 
