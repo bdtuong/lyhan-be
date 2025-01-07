@@ -59,6 +59,8 @@ const LoginUser = async (req, res, next) => {
         if (!ValidPassword) {
             throw new ApiError(StatusCodes.UNAUTHORIZED, 'Wrong Password');
         }
+
+        if(User && ValidPassword){
         const access_token = GenerateAccessToken(User);
         const refresh_token = GenerateRefreshToken(User);
 
@@ -78,8 +80,8 @@ const LoginUser = async (req, res, next) => {
         res.status(StatusCodes.OK).json({
             ...UserWithoutPassword,
             access_token,
-            refresh_token,
         });
+    }
     } catch (error) {
         next(error);
     }
