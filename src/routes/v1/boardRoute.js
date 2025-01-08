@@ -12,7 +12,7 @@ Router.route('/')
     .post(boardValidation.createNew, boardController.createNew)
 
 
-Router.route('/:Id')
+Router.route('/:id')
     .get(boardController.getDetails)
     .put
 

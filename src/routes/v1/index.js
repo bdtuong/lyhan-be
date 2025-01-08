@@ -3,7 +3,7 @@ import { StatusCodes} from 'http-status-codes'
 import {boardRoute} from './boardRoute.js'
 import {AuthRoute} from './AuthRoute.js'
 import {UserRoute} from './UserRoute.js'
-
+import {boardCollectionRoute} from './boardCollectionRoute.js'
 
 const Router = express.Router()
 
@@ -20,6 +20,8 @@ Router.use('/Auth',AuthRoute)
 
 //User APIs v1/User
 Router.use('/User',UserRoute)
+
+Router.use('/page',boardCollectionRoute)
 
 
 

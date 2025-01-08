@@ -50,7 +50,7 @@ const findOneById = async (id) => {
         throw new Error(error)
     }
 }
-// querry aggregate để lấy thông tin về columns và cards
+
 const getDetails = async (id) => {
     try {
                // return await GET_DB().collection(USER_COLLECTION_NAME).findOne({_id: new ObjectId(id)})
@@ -72,8 +72,7 @@ const getDetails = async (id) => {
         throw new Error(error)
     }
 }
-
-
+// lay board da dc phan loai theo thoi gian
 
 
 export const boardModel = {
@@ -82,4 +81,5 @@ export const boardModel = {
     createNew,
     findOneById,
     getDetails
+    
 }

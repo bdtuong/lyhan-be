@@ -5,7 +5,6 @@ import { slugify } from '../utils/formatters.js'
 
 const createNew = async (reqBody) => {
     try{
-        
         if (!reqBody || !reqBody.username) {
             throw new Error('Username is required');
         }
@@ -20,14 +19,11 @@ const createNew = async (reqBody) => {
         }
         // Gọi tầng Models để xử lý  lưu bản ghi newUser vào database
         const createdUser = await AuthModel.createNew(newUser)
-
         // lấy bản ghi User sau khi gọi 
         const getNewUser = await AuthModel.findOneById(createdUser.insertedId)
-        
         // trả kết quả trong service
         return getNewUser
     } 
-    
     catch (error) { throw error }
 }
 
