@@ -13,3 +13,5 @@ export const slugify = (val) => {
       .replace(/-+/g, '-') // remove consecutive hyphens
   }
 
+
+
