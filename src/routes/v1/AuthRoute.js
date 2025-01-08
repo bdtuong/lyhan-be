@@ -20,6 +20,6 @@ Router1.route('/refresh-token')
     .post(AuthController.requestRefreshToken)
 
 Router1.route('/logout')//phải login mới logout được nên thêm middlewareToken.verifyToken
-    .post(middlewareToken.verifyToken, AuthController.Logout)
+    .post(AuthController.Logout)
     
 export const AuthRoute = Router1
