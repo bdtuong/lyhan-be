@@ -8,14 +8,10 @@ const COMMENT_COLLECTION_NAME = 'comments'
 const COMMENT_COLLECTION_SCHEMA = Joi.object({
     // optional có thể thêm lượt like sau
     boardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-<<<<<<< HEAD
-    createdUserId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-=======
     boardID: Joi.required(),
     userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     author: Joi.required(),
     Username: Joi.required(),
->>>>>>> 892e7c5143494fae1ca6ebcb887576775b30cddd
     content: Joi.string().required(),
     slug: Joi.string().trim().strict(),
 
