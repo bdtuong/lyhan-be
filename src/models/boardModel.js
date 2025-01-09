@@ -2,7 +2,7 @@ import Joi from 'joi'
 import {ObjectId} from'mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 import { GET_DB } from '../config/mongodb.js'
-import { commentModel } from './commentModel.js'
+import { commentModel } from './CommentModel.js'
 
 
 

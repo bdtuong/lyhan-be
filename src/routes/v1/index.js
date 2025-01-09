@@ -4,6 +4,7 @@ import {boardRoute} from './boardRoute.js'
 import {AuthRoute} from './AuthRoute.js'
 import {UserRoute} from './UserRoute.js'
 import {boardCollectionRoute} from './boardCollectionRoute.js'
+import {CommentRoute} from './CommentRoute.js'
 
 const Router = express.Router()
 
@@ -20,6 +21,10 @@ Router.use('/Auth',AuthRoute)
 
 //User APIs v1/User
 Router.use('/User',UserRoute)
+
+//User APIs v1/Comment
+Router.use('/Comment',CommentRoute)
+
 
 Router.use('/page',boardCollectionRoute)
 

@@ -53,7 +53,7 @@ const getDetails = async (id) => {
 
 
 
-export const commentModel = {
+export const CommentModel = {
     COMMENT_COLLECTION_NAME,
     COMMENT_COLLECTION_SCHEMA,
     createNew,
