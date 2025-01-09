@@ -4,9 +4,7 @@ import { CommentService } from '../../services/CommentService.js';
 
 const createComment = async (req, res, next) => {
     try {
-        // Assuming req.body contains the comment data
         const createdComment = await CommentService.createComment(req.body);
-        
         res.status(StatusCodes.CREATED).json(createdComment);
     } catch (error) {
         next(error);

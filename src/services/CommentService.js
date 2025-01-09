@@ -9,7 +9,7 @@ const createComment = async (reqBody) => {
         const commentData = {
             ...reqBody,
             author: new ObjectId(reqBody.userId), // Convert userId to ObjectId
-            boardId: new ObjectId(reqBody.boardId), // Assuming comments are linked to posts
+            boardID: new ObjectId(reqBody.boardId), // Assuming comments are linked to posts
         };
 
         // Save the new comment to the database

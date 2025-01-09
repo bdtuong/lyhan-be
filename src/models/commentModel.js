@@ -8,7 +8,9 @@ const COMMENT_COLLECTION_NAME = 'comments'
 const COMMENT_COLLECTION_SCHEMA = Joi.object({
     // optional có thể thêm lượt like sau
     boardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-    author: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    boardID: Joi.required(),
+    userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    author: Joi.required(),
     content: Joi.string().required(),
     slug: Joi.string().trim().strict(),
 
@@ -45,11 +47,24 @@ const findOneById = async (id) => {
 // querry aggregate để lấy thông tin về 
 const getDetails = async (id) => {
     try {
-        return await GET_DB().collection(COMMENT_COLLECTION_NAME).findOne({_id: new ObjectId(id)})
+        return await GET_DB().collection(COMMENT_COLLECTION_NAME).aggregate([
+            { $match: { 
+                _id: new ObjectId(id),
+                _destroy: false
+            } },
+            {
+                $lookup: {
+                    from: CommentModel.COMMENT_COLLECTION_NAME, 
+                    localField: '_id',
+                    foreignField: 'commentId',
+                    as: 'authorComments',
+                },
+            },
+        ]).toArray();
     } catch (error) {
-        throw new Error(error)
+        throw new Error(`Error in getDetails: ${error.message}`);
     }
-}
+};
 
 
 
