@@ -11,7 +11,7 @@ const createNew = async (reqBody) => {
 
         const objectId = {
             ...reqBody,
-            userID: new ObjectId(reqBody.userId)
+            userID: new ObjectId(reqBody.userId),
         }
 
         // Gọi tầng Models để xử lý  lưu bản ghi newBoard vào databas

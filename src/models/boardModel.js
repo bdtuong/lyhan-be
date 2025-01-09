@@ -15,6 +15,14 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
     userID: Joi.required(),
     title: Joi.string().required().min(3).max(50).trim().strict(),
 
+    boardCollectionID: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE).custom((value, helpers) => {
+            try {
+                return new ObjectId(value); // Chuyển thành ObjectId
+            } catch (error) {
+                return helpers.error('any.invalid');
+            }
+        })
+        .default(new ObjectId('677e53f474f256608d6044a2')),
 
     description: Joi.string().required().min(3).max(256).trim().strict(),
     content: Joi.string().required(),
