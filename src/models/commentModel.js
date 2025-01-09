@@ -23,13 +23,13 @@ const validateBeforeCreate = async (data) => {
     return await COMMENT_COLLECTION_SCHEMA.validateAsync(data, {abortEarly: false})
 }
 
-const createNew = async (data) => {
+const createComment = async (data) => {
     try {
         const validData = await validateBeforeCreate(data)
         console.log('validData: ', validData)
-        const createdBoard = await GET_DB().collection(COMMENT_COLLECTION_NAME).insertOne(validData)
+        const createdComment = await GET_DB().collection(COMMENT_COLLECTION_NAME).insertOne(validData)
 
-        return createdBoard
+        return createdComment
     } catch (error) {
         throw new Error(error)
     }
@@ -56,7 +56,7 @@ const getDetails = async (id) => {
 export const CommentModel = {
     COMMENT_COLLECTION_NAME,
     COMMENT_COLLECTION_SCHEMA,
-    createNew,
+    createComment,
     findOneById,
     getDetails
 }

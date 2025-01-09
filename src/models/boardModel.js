@@ -2,7 +2,7 @@ import Joi from 'joi'
 import {ObjectId} from'mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 import { GET_DB } from '../config/mongodb.js'
-import { commentModel } from './CommentModel.js'
+import { CommentModel } from './CommentModel.js'
 
 
 
@@ -60,7 +60,7 @@ const getDetails = async (id) => {
                         _destroy: false
                     } },
                     {$lookup: {
-                        from: commentModel.COMMENT_COLLECTION_NAME,
+                        from: CommentModel.COMMENT_COLLECTION_NAME,
                         localField: '_id',
                         foreignField: 'boardId',
                         as: 'comments'

@@ -2,10 +2,11 @@ import { StatusCodes } from 'http-status-codes';
 import ApiError from '../../utils/ApiError.js';
 import { CommentService } from '../../services/CommentService.js';
 
-const createNew = async (req, res, next) => {
+const createComment = async (req, res, next) => {
     try {
         // Assuming req.body contains the comment data
-        const createdComment = await commentService.createNew(req.body);
+        const createdComment = await CommentService.createComment(req.body);
+        
         res.status(StatusCodes.CREATED).json(createdComment);
     } catch (error) {
         next(error);
@@ -15,7 +16,7 @@ const createNew = async (req, res, next) => {
 const getDetails = async (req, res, next) => {
     try {
         const commentId = req.params.id; 
-        const comment = await commentService.getDetails(commentId);
+        const comment = await CommentService.getDetails(commentId);
         
         res.status(StatusCodes.OK).json(comment);
     } catch (error) {
@@ -26,7 +27,7 @@ const getDetails = async (req, res, next) => {
 const updateComment = async (req, res, next) => {
     try {
         const commentId = req.params.id;
-        const updatedComment = await commentService.updateComment(commentId, req.body);
+        const updatedComment = await CommentService.updateComment(commentId, req.body);
         
         res.status(StatusCodes.OK).json(updatedComment);
     } catch (error) {
@@ -37,7 +38,7 @@ const updateComment = async (req, res, next) => {
 const deleteComment = async (req, res, next) => {
     try {
         const commentId = req.params.id;
-        const deleted = await commentService.deleteComment(commentId);
+        const deleted = await CommentService.deleteComment(commentId);
         
         res.status(StatusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -45,8 +46,8 @@ const deleteComment = async (req, res, next) => {
     }
 };
 
-export const commentController = {
-    createNew,
+export const CommentController = {
+    createComment,
     getDetails,
     updateComment,
     deleteComment,

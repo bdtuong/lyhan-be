@@ -1,10 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
-import { commentModel } from '../models/CommentModel.js';
+import { CommentModel } from '../models/CommentModel.js';
 import ApiError from '../utils/ApiError.js';
 import { ObjectId } from 'mongodb';
 
 
-const createNew = async (reqBody) => {
+const createComment = async (reqBody) => {
     try {
         const commentData = {
             ...reqBody,
@@ -13,10 +13,10 @@ const createNew = async (reqBody) => {
         };
 
         // Save the new comment to the database
-        const createdComment = await commentModel.createComment(commentData);
+        const createdComment = await CommentModel.createComment(commentData);
 
         // Retrieve the comment after creation
-        const getNewComment = await commentModel.findOneById(createdComment.insertedId);
+        const getNewComment = await CommentModel.findOneById(createdComment.insertedId);
 
         return getNewComment;
     } catch (error) {
@@ -27,7 +27,7 @@ const createNew = async (reqBody) => {
 
 const getDetails = async (commentId) => {
     try {
-        const comment = await commentModel.findOneById(new ObjectId(commentId));
+        const comment = await CommentModel.findOneById(new ObjectId(commentId));
         if (!comment) {
             throw new ApiError(StatusCodes.NOT_FOUND, 'Comment not found!');
         }
@@ -39,7 +39,7 @@ const getDetails = async (commentId) => {
 
 const updateComment = async (commentId, updateData) => {
     try {
-        const updatedComment = await commentModel.updateOneById(new ObjectId(commentId), updateData);
+        const updatedComment = await CommentModel.updateOneById(new ObjectId(commentId), updateData);
         if (!updatedComment) {
             throw new ApiError(StatusCodes.NOT_FOUND, 'Comment not found!');
         }
@@ -51,7 +51,7 @@ const updateComment = async (commentId, updateData) => {
 
 const deleteComment = async (commentId) => {
     try {
-        const deleted = await commentModel.deleteOneById(new ObjectId(commentId));
+        const deleted = await CommentModel.deleteOneById(new ObjectId(commentId));
         if (!deleted) {
             throw new ApiError(StatusCodes.NOT_FOUND, 'Comment not found!');
         }
@@ -63,7 +63,7 @@ const deleteComment = async (commentId) => {
 
 const getSortedComments = async (postId) => {
     try {
-        const comments = await commentModel.findManyByPostId(new ObjectId(postId));
+        const comments = await CommentModel.findManyByPostId(new ObjectId(postId));
         return comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     } catch (error) {
         throw error;
@@ -71,7 +71,7 @@ const getSortedComments = async (postId) => {
 };
 
 export const CommentService = {
-    createNew,
+    createComment,
     getDetails,
     updateComment,
     deleteComment,

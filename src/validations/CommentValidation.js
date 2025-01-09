@@ -5,20 +5,7 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 
 const createComment = async (req , res , next )=> {
     const correctCondition = Joi.object({
-        boardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE).message({
-            'any.required': 'boardId is required',
-            'string.empty': 'boardId is not allowed to be empty',
-        }),
-        author: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE).message({
-            'any.required': 'author is required',
-            'string.empty': 'author is not allowed to be empty',
-        }),
-        content: Joi.string().required().message({
-            'any.required': 'content is required',
-            'string.empty': 'content is not allowed to be empty',
-        }),
-        
-        
+        content: Joi.string().required(),
         
     })
 
