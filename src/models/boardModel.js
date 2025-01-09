@@ -13,7 +13,7 @@ const BOARD_COLLECTION_NAME = 'boards'
 const BOARD_COLLECTION_SCHEMA = Joi.object({
     userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     userID: Joi.required(),
-    title: Joi.string().required().min(3).max(50).trim().strict(),
+    title: Joi.string().required().min(3).trim(),
     Username: Joi.required(),
 
     boardCollectionID: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE).custom((value, helpers) => {
@@ -25,7 +25,7 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
         })
         .default(new ObjectId('677e53f474f256608d6044a2')),
 
-    description: Joi.string().required().min(3).max(256).trim().strict(),
+    description: Joi.string().required().min(3).trim(),
     content: Joi.string().required(),
 
 

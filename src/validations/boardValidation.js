@@ -5,7 +5,7 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 
 const createNew = async (req , res , next )=> {
     const correctCondition = Joi.object({
-        title: Joi.string().required().min(3).max(50).trim().strict().messages({
+        title: Joi.string().required().min(3).trim().messages({
             //custom message
             'any.required': 'Title is required',
             'string.empty': 'Title is not allowed to be empty',
@@ -13,7 +13,7 @@ const createNew = async (req , res , next )=> {
             'string.max': 'Title must be at most 50 characters long',
             'string.trim': 'Title must not have leading or trailing whitespace'
         }),
-        description: Joi.string().required().min(3).max(256).trim().strict().messages({
+        description: Joi.string().required().min(3).trim().messages({
             'any.required': 'description is required',
             'string.empty': 'description is not allowed to be empty',
             'string.min': 'description must be at least 3 characters long',
