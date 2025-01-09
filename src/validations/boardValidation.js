@@ -16,7 +16,7 @@ const createNew = async (req , res , next )=> {
         description: Joi.string().required().min(3).max(256).trim().strict().messages({
             'any.required': 'description is required',
             'string.empty': 'description is not allowed to be empty',
-            'string.min': 'description must be at least 8 characters long',
+            'string.min': 'description must be at least 3 characters long',
             'string.max': 'description must be at most 50 characters long',
             'string.trim': 'description must not have leading or trailing whitespace'
         }),
