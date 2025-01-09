@@ -2,7 +2,7 @@ import Joi from 'joi'
 import {ObjectId} from'mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 import { GET_DB } from '../config/mongodb.js'
-import { commentModel } from './commentModel.js'
+import { CommentModel } from './CommentModel.js'
 
 
 
@@ -14,8 +14,17 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
     userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     userID: Joi.required(),
     title: Joi.string().required().min(3).max(50).trim().strict(),
+    Username: Joi.required(),
 
-  
+    boardCollectionID: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE).custom((value, helpers) => {
+            try {
+                return new ObjectId(value); // Chuyển thành ObjectId
+            } catch (error) {
+                return helpers.error('any.invalid');
+            }
+        })
+        .default(new ObjectId('677e53f474f256608d6044a2')),
+
     description: Joi.string().required().min(3).max(256).trim().strict(),
     content: Joi.string().required(),
 
@@ -60,7 +69,7 @@ const getDetails = async (id) => {
                         _destroy: false
                     } },
                     {$lookup: {
-                        from: commentModel.COMMENT_COLLECTION_NAME,
+                        from: CommentModel.COMMENT_COLLECTION_NAME,
                         localField: '_id',
                         foreignField: 'boardId',
                         as: 'comments'

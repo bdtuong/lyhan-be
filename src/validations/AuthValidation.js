@@ -10,7 +10,7 @@ const createNew = async (req , res , next )=> {
             'any.required': 'Username is required',
             'string.empty': 'Username is not allowed to be empty',
             'string.min': 'Username must be at least 6 characters long',
-            'string.max': 'Username must be at most 20 characters long',
+            'string.max': 'Username must be at mos 20t characters long',
             'string.trim': 'Username must not have leading or trailing whitespace'
         }),
         userID: Joi.string().required().min(6).max(30).trim().strict().messages({

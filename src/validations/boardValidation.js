@@ -5,23 +5,29 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 
 const createNew = async (req , res , next )=> {
     const correctCondition = Joi.object({
-        title: Joi.string().required().min(8).max(50).trim().strict().messages({
+        title: Joi.string().required().min(3).max(50).trim().strict().messages({
             //custom message
             'any.required': 'Title is required',
             'string.empty': 'Title is not allowed to be empty',
-            'string.min': 'Title must be at least 8 characters long',
+            'string.min': 'Title must be at least 3 characters long',
             'string.max': 'Title must be at most 50 characters long',
             'string.trim': 'Title must not have leading or trailing whitespace'
         }),
         description: Joi.string().required().min(3).max(256).trim().strict().messages({
             'any.required': 'description is required',
             'string.empty': 'description is not allowed to be empty',
-            'string.min': 'description must be at least 8 characters long',
+            'string.min': 'description must be at least 3 characters long',
             'string.max': 'description must be at most 50 characters long',
             'string.trim': 'description must not have leading or trailing whitespace'
         }),
         userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-        content: Joi.string().required()
+        content: Joi.string().required(),
+        boardCollectionID: Joi.string()
+        .pattern(OBJECT_ID_RULE)
+        .default('677e53f474f256608d6044a2') // Gán giá trị mặc định
+        .messages({
+            'string.pattern.base': 'Invalid boardCollectionID format',
+        }),
 
 
     })
