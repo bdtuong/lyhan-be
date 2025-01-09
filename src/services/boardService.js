@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import {boardModel} from '../models/boardModel.js'
 import ApiError from '../utils/ApiError.js'
 import { slugify } from '../utils/formatters.js'
+import {AuthModel} from '../models/AuthModel.js';
 import {  ObjectId } from 'mongodb'
 
 const createNew = async (reqBody) => {
@@ -12,6 +13,7 @@ const createNew = async (reqBody) => {
         const objectId = {
             ...reqBody,
             userID: new ObjectId(reqBody.userId),
+            Username: new ObjectId(reqBody.username),
         }
 
         // Gọi tầng Models để xử lý  lưu bản ghi newBoard vào databas

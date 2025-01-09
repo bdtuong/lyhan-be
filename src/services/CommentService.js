@@ -1,7 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
-import { CommentModel } from '../models/CommentModel.js';
+import { CommentModel } from '../models/commentModel.js';
 import ApiError from '../utils/ApiError.js';
 import { ObjectId } from 'mongodb';
+import {AuthModel} from '../models/AuthModel.js';
 
 
 const createComment = async (reqBody) => {
@@ -10,6 +11,7 @@ const createComment = async (reqBody) => {
             ...reqBody,
             author: new ObjectId(reqBody.userId), // Convert userId to ObjectId
             boardID: new ObjectId(reqBody.boardId), // Assuming comments are linked to posts
+            Username: new ObjectId(reqBody.username),
         };
 
         // Save the new comment to the database
