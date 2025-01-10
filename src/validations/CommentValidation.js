@@ -7,7 +7,7 @@ const createComment = async (req , res , next )=> {
     const correctCondition = Joi.object({
         boardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
         userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-        content: Joi.string().required(),
+        content: Joi.string().required().min(1),
     });
 
     try {

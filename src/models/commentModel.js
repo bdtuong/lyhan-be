@@ -11,7 +11,7 @@ const COMMENT_COLLECTION_SCHEMA = Joi.object({
     boardID: Joi.required(),
     userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     author: Joi.required(),
-    content: Joi.string().required(),
+    content: Joi.string().required().min(1),
     slug: Joi.string().trim().strict(),
 
 
