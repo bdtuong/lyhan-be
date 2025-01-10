@@ -36,7 +36,6 @@ Liệt kê các công nghệ, ngôn ngữ và thư viện được sử dụng. 
 *   MongoDB 
 *   JWT (JSON Web Token)
 *   Joi
-*   React Vite
 *   các thư viện nhỏ khác
 
 ## Cài đặt
