@@ -11,7 +11,6 @@ const createComment = async (reqBody) => {
             ...reqBody,
             author: new ObjectId(reqBody.userId), // Convert userId to ObjectId
             boardID: new ObjectId(reqBody.boardId), // Assuming comments are linked to posts
-            Username: new ObjectId(reqBody.username),
         };
 
         // Save the new comment to the database
