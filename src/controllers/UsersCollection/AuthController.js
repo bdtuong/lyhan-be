@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import { AuthService } from '../../services/AuthService.js'
 import { AuthModel } from '../../models/AuthModel.js'
 import  ApiError  from '../../utils/ApiError.js'
+import { env } from '../../config/environment.js'
 import bcrypt from 'bcrypt'
 import  jwt  from 'jsonwebtoken'
 
@@ -29,7 +30,7 @@ const GenerateAccessToken = (User) => {
         id: User._id,
         admin: User.admin
     },
-    process.env.JWT_ACCESS_TOKEN_SECRET,
+    env.JWT_ACCESS_TOKEN_SECRET,
     {expiresIn: '1m'}
     )
 }
@@ -39,7 +40,7 @@ const GenerateRefreshToken = (User) => {
         id: User._id,
         admin: User.admin
     },
-    process.env.JWT_REFRESH_TOKEN_SECRET,
+    env.JWT_REFRESH_TOKEN_SECRET,
     {expiresIn: '365d'}
     )
 }
@@ -73,6 +74,7 @@ const LoginUser = async (req, res, next) => {
             secure: false, // Set to true in production
             sameSite: 'strict', // Prevent CSRF
         });
+        
 
         // Prepare the response without exposing the user's password
         const userData = User._doc || User; // Handle cases where _doc might be missing
@@ -89,36 +91,50 @@ const LoginUser = async (req, res, next) => {
 
 
 //Reset lại access token, refresh token khi hết hạn
-const requestRefreshToken = async (req, res) => {
-    //Lấy refresh token từ User
-    const refreshtoken = req.cookies.refreshtoken
-    if(!refreshtoken){
-        throw new ApiError(StatusCodes.UNAUTHORIZED, 'No refresh token')
-    }
-    //nếu không phải refresh token của mình thì báo lỗi
-    if(!refresh_tokens.includes(refreshtoken)){
-        throw new ApiError(StatusCodes.UNAUTHORIZED, 'Refresh token is not valid')
-    }
-    jwt.verify(refreshtoken, process.env.JWT_REFRESH_TOKEN_SECRET, (err, User) => {
-        if(err){
-            throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid refresh token')
-        }
-        //lọc ra refresh token cũ
-        refresh_tokens = refresh_tokens.filter(token => token !== refreshtoken)
-        //tạo access token, refresh token mới
-        const new_access_token = GenerateAccessToken(User)
-        const new_refreshtoken = GenerateRefreshToken(User)
-        refresh_tokens.push(new_refreshtoken)
-        res.cookie('refreshtoken', new_refreshtoken, {
-            httpOnly: true,
-            path: '/refreshtoken',
-            secure:false,//deploy lên server thì true
-            sameSite: "strict" // ngăn chặn CSRF
-        })
-        res.status(StatusCodes.OK).json({new_access_token})
-    })
+const requestRefreshToken = async (req, res, next) => {
+    try {
+        //Lấy refresh token từ cookies hoặc headers
+        const refreshtoken = req.cookies?.refreshtoken || req.headers['authorization']?.split(' ')[1]; 
 
-}
+        if (!refreshtoken) {
+            throw new ApiError(StatusCodes.UNAUTHORIZED, 'No refresh token');
+        }
+
+        //Kiểm tra xem refresh token có hợp lệ không
+        if (!refresh_tokens.includes(refreshtoken)) {
+            throw new ApiError(StatusCodes.UNAUTHORIZED, 'Refresh token is not valid');
+        }
+
+        //Verify refresh token
+        jwt.verify(refreshtoken, process.env.JWT_REFRESH_TOKEN_SECRET, (err, User) => {
+            if (err) {
+                throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid refresh token');
+            }
+
+            //Remove old refresh token
+            refresh_tokens = refresh_tokens.filter(token => token !== refreshtoken);
+
+            //Tạo access token và refresh token mới
+            const new_access_token = GenerateAccessToken(User);
+            const new_refreshtoken = GenerateRefreshToken(User);
+
+            refresh_tokens.push(new_refreshtoken); // Update refresh tokens
+
+            //Set refresh token cookie
+            res.cookie('refreshtoken', new_refreshtoken, {
+                httpOnly: true,
+                path: '/refreshtoken',
+                secure: process.env.NODE_ENV === 'production',  // Deploy server cần set true
+                sameSite: "strict" 
+            });
+
+            res.status(StatusCodes.OK).json({ new_access_token });
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 const getDetails = async (req, res, next) => {
     try {
@@ -135,7 +151,7 @@ const getDetails = async (req, res, next) => {
 const Logout = async (req, res) => {
     res.clearCookie('refreshtoken', {
         httpOnly: true,
-        secure: false,
+        secure: process.env.NODE_ENV === 'production',
         sameSite: "strict",
         path: "/",
     })
@@ -154,10 +170,51 @@ const Logout = async (req, res) => {
 
 //có thể xem BFF (Backend for Frontend) để xử lý vấn đề này
 
+
+/*const changePassword = async (req, res, next) => {
+    try {
+        
+        const { oldPassword, newPassword } = req.body;
+        const userId = req.user._id;  // Assuming you have JWT authorization and user is already authenticated
+
+        // Fetch the user from the database
+        const user = await UserModel.findOneById(userId);
+        if (!user) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+        }
+
+        // Check if old password is correct
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+        throw new ApiError(StatusCodes.UNAUTHORIZED, 'Old password is incorrect');
+        }
+
+        // Hash the new password and save to the database
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        user.password = hashedPassword;
+        user.updatedAt = new Date();
+        const updatedUser =await user.save();
+
+
+        // Remove password from the response
+        const { password, ...userWithoutPassword } = updatedUser.toObject();
+
+        res.status(StatusCodes.OK).json({
+            message: 'Password changed successfully',
+            user: userWithoutPassword,
+        });
+    } catch (error) {
+        next(error);
+    }
+};*/
+
 export const AuthController = {
     createNew,
     getDetails,
     LoginUser,
     requestRefreshToken,
-    Logout
+    Logout,
+    //changePassword
 }

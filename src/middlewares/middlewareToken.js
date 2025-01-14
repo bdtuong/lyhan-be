@@ -2,20 +2,31 @@ import jwt from 'jsonwebtoken'
 
 const middlewareToken = {
     verifyToken:  (req, res, next) => {
-        const token = req.headers.token
-        if(token){
-            const access_token = token.split(" ")[1]
-            jwt.verify(access_token, process.env.JWT_ACCESS_TOKEN_SECRET, (err, user) => {
-                if(err){
-                    return res.status(403).json({message: 'Invalid token'})
+        try {
+            const token = req.cookies['jwt'];
+            if (!token) {
+                throw new ApiError(StatusCodes.UNAUTHORIZED, 'Access token is required to access this resource.');
+            }
+        
+            // Verify token
+            jwt.verify(token, env.JWT_ACCESS_TOKEN_SECRET, async (err, decoded) => {
+                if (err) {
+                throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid or expired token.');
                 }
-                req.user = user
-                next()
-            })
-        }
-        else{
-            return res.status(401).json({message: 'Access denied'})
-        }
+        
+            // Find user from decoded token (assuming you save userId in token)
+            const user = await AuthModel.findOneById(decoded.userId);
+            if (!user) {
+                throw new ApiError(StatusCodes.UNAUTHORIZED, 'User does not exist or is inactive.');
+            }
+        
+            // Attach user to request object for further use in controller
+            req.user = user;
+            next();
+            });
+        } catch (error) {
+            next(error);
+            }
     },
     verifyTokenAndAdminAuth: (req, res, next) => {
         middlewareToken.verifyToken(req, res, () => {
