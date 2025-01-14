@@ -1,5 +1,4 @@
 import { StatusCodes } from 'http-status-codes';
-import ApiError from '../../utils/ApiError.js';
 import { CommentService } from '../../services/CommentService.js';
 
 const createComment = async (req, res, next) => {

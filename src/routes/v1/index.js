@@ -5,6 +5,7 @@ import {AuthRoute} from './AuthRoute.js'
 import {UserRoute} from './UserRoute.js'
 import {boardCollectionRoute} from './boardCollectionRoute.js'
 import {CommentRoute} from './CommentRoute.js'
+import { myProfileRoute } from './myProfileRoute.js'
 
 const Router = express.Router()
 
@@ -27,6 +28,9 @@ Router.use('/Comment',CommentRoute)
 
 
 Router.use('/page',boardCollectionRoute)
+
+//myProfile APIs v1/myProfile
+Router.use('/myProfile',myProfileRoute)
 
 
 
