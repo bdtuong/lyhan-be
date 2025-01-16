@@ -6,8 +6,8 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 
 const MYPROFILE_COLLECTION_NAME = 'myprofiles'
 const MYPROFILE_COLLECTION_SCHEMA = Joi.object({
-    userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-    owner: Joi.required(),
+    userId: Joi.required(),
+    owner: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     username: Joi.string().required(),
     slug: Joi.string().trim().strict(),
     age: Joi.number().integer().min(0).max(1000).allow(null),
@@ -70,11 +70,13 @@ const getDetails = async (userId) => {
 
 
 
+
+
 export const myProfileModel = {
     MYPROFILE_COLLECTION_NAME,
     MYPROFILE_COLLECTION_SCHEMA,
     createmyProfile,
     findOneById,
     getDetails,
-    getAllProfiles
+    getAllProfiles,
 }

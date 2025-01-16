@@ -9,14 +9,14 @@ const createmyProfile = async (reqBody) => {
     try {
         const myProfileData = {
             ...reqBody,
-            owner: new ObjectId(reqBody.userId), // Convert userId to ObjectId
-            slug: slugify(reqBody.username)
+            slug: slugify(reqBody.username),
+            userId: new ObjectId(reqBody.owner),
         };
 
-        // Save the new comment to the database
+        // lưu vào database
         const createdmyProfile = await myProfileModel.createmyProfile(myProfileData);
 
-        // Retrieve the comment after creation
+        //trả về client
         const getNewmyProfile = await myProfileModel.findOneById(createdmyProfile.insertedId);
 
         return getNewmyProfile;
@@ -47,9 +47,8 @@ const getDetails = async (myProfileId) => {
 };
 
 
-
 export const myProfileService = {
     createmyProfile,
     getDetails,
-    getAllProfiles
+    getAllProfiles,
 };

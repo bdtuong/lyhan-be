@@ -46,8 +46,10 @@ const getDetails = async (req, res, next) => {
 };
 
 
+
+
 export const myProfileController = {
     createmyProfile,
     getDetails,
-    getAllProfiles
+    getAllProfiles,
 };

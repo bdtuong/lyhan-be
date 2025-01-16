@@ -5,16 +5,25 @@ import  ApiError  from '../../utils/ApiError.js'
 import { env } from '../../config/environment.js'
 import bcrypt from 'bcrypt'
 import  jwt  from 'jsonwebtoken'
-
+//import { myProfileService } from '../../services/myProfileService.js'
 
 const createNew = async (req, res, next) => {
     try {
         
         //điều hướng đến tầng service
         const createdUser = await AuthService.createNew(req.body)
+        
     
+
         //có kết quả thì trả về Client
         res.status(StatusCodes.CREATED).json(createdUser)
+
+        // Tạo profile tự động sau khi tạo user thành công (cách 2-tạo ở backend)
+        /*const profileData = {
+            username: req.body.username,
+            owner: createdUser._id.toString(), 
+        };
+        await myProfileService.createmyProfile(profileData);*/
     } catch (error) {
         next(error)
     }
