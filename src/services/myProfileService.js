@@ -10,7 +10,7 @@ const createmyProfile = async (reqBody) => {
         const myProfileData = {
             ...reqBody,
             owner: new ObjectId(reqBody.userId), // Convert userId to ObjectId
-            slug: slugify(reqBody.userId)
+            slug: slugify(reqBody.username)
         };
 
         // Save the new comment to the database
