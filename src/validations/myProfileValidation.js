@@ -25,9 +25,8 @@ const createmyProfile = async (req , res , next )=> {
     }   catch (error) {
         next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
     }
-    
 }
 
 export const myProfileValidation = {
-    createmyProfile
+    createmyProfile,
 }

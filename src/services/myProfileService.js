@@ -26,6 +26,14 @@ const createmyProfile = async (reqBody) => {
 };
 
 
+const getAllProfiles = async () => {
+    try {
+        return await myProfileModel.getAllProfiles();
+    } catch (error) {
+        throw error;
+    }
+};
+
 const getDetails = async (myProfileId) => {
     try {
         const myProfile = await myProfileModel.findOneById(new ObjectId(myProfileId));
@@ -39,7 +47,9 @@ const getDetails = async (myProfileId) => {
 };
 
 
+
 export const myProfileService = {
     createmyProfile,
     getDetails,
+    getAllProfiles
 };

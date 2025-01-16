@@ -6,10 +6,7 @@ const Router4 = express.Router()
 
 Router4.route('/')
     .post(myProfileValidation.createmyProfile, myProfileController.createmyProfile)
-
-Router4.route('/:id')
-    .get(myProfileController.getDetails)
-    .put
+    .get(myProfileController.getAllProfiles)
 
 
 export const myProfileRoute = Router4

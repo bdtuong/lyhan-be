@@ -47,23 +47,22 @@ const findOneById = async (id) => {
         throw new Error(error)
     }
 }
-// querry aggregate để lấy thông tin về 
-const getDetails = async (id) => {
+
+
+const getAllProfiles = async () => {
     try {
-        return await GET_DB().collection(MYPROFILE_COLLECTION_NAME).aggregate([
-            { $match: { 
-                _id: new ObjectId(id),
-                _destroy: false
-            } },
-            {
-                $lookup: {
-                    from: myProfileModel.MYPROFILE_COLLECTION_NAME, 
-                    localField: '_id',
-                    foreignField: 'myProfileId',
-                    as: 'owner',
-                },
-            },
-        ]).toArray();
+        return await GET_DB().collection(MYPROFILE_COLLECTION_NAME).find({ _destroy: false }).toArray();
+    } catch (error) {
+        throw new Error(`Error getting profiles: ${error.message}`);
+    }
+};
+
+const getDetails = async (userId) => {
+    try {
+        return await GET_DB().collection(MYPROFILE_COLLECTION_NAME).findOne({
+            owner: new ObjectId(userId),
+            _destroy: false
+        });
     } catch (error) {
         throw new Error(`Error in getDetails: ${error.message}`);
     }
@@ -76,5 +75,6 @@ export const myProfileModel = {
     MYPROFILE_COLLECTION_SCHEMA,
     createmyProfile,
     findOneById,
-    getDetails
+    getDetails,
+    getAllProfiles
 }
