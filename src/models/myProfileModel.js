@@ -57,18 +57,32 @@ const getAllProfiles = async () => {
     }
 };
 
-const getDetails = async (userId) => {
+const getDetails = async (owner) => {
     try {
         return await GET_DB().collection(MYPROFILE_COLLECTION_NAME).findOne({
-            owner: new ObjectId(userId),
-            _destroy: false
+            userId: new ObjectId(owner),
+            _destroy: false,
         });
     } catch (error) {
         throw new Error(`Error in getDetails: ${error.message}`);
     }
 };
 
+const updateOne = async (filter, update) => {
+    try {
+        return await GET_DB().collection(MYPROFILE_COLLECTION_NAME).updateOne(filter, update);
+    } catch (error) {
+        throw new Error(error);
+    }
+};
 
+const findOne = async (filter) => {
+    try {
+        return await GET_DB().collection(MYPROFILE_COLLECTION_NAME).findOne(filter);
+    } catch (error) {
+        throw new Error(error);
+    }
+};
 
 
 
@@ -79,4 +93,7 @@ export const myProfileModel = {
     findOneById,
     getDetails,
     getAllProfiles,
+    updateOne,
+    findOne,
+    validateBeforeCreate
 }

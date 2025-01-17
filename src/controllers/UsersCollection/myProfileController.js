@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import {myProfileService} from '../../services/myProfileService.js'
+import ApiError from '../../utils/ApiError.js'
 
 const createmyProfile = async (req, res, next) => {
     try {
@@ -21,25 +22,31 @@ const getAllProfiles = async (req, res, next) => {
 
 const getDetails = async (req, res, next) => {
     try {
-        // Nhận userId từ params hoặc từ user trong session/token
-        let userId;
-        if (req.params.id) {
-            userId = req.params.id; // Nếu có ID ở params
-        } else if (req.user) {
-            userId = req.user.id; // Nếu đã xác thực qua token hoặc session
-        }
-
-        if (!userId) {
-            throw new ApiError(StatusCodes.BAD_REQUEST, 'User ID is required');
-        }
-
-        const myProfile = await myProfileService.getDetails(userId);
-        
+        const userId = req.query.owner;
+        const myProfile = await myProfileService.getDetails(userId); // Gọi service để lấy chi tiết profile
         if (!myProfile) {
             throw new ApiError(StatusCodes.NOT_FOUND, 'Profile not found!');
         }
-
         return res.status(StatusCodes.OK).json(myProfile);
+    } catch (error) {
+        next(error);
+    }
+};
+
+const updateProfile = async (req, res, next) => {
+    try {
+        const userId = req.params.owner;
+        const updatedProfile = req.body;
+      // Validate updatedProfile using the same schema as for creating a profile
+      const { error } = myProfileService.validateProfileData(updatedProfile); // Assuming you have a validation function in myProfileService
+        if (error) {
+        return res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({ message: error.details[0].message });
+        }
+        const updated = await myProfileService.updateProfile(userId, updatedProfile);
+        if (!updated) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'Profile not found');
+        }
+        res.json(updated);
     } catch (error) {
         next(error);
     }
@@ -52,4 +59,5 @@ export const myProfileController = {
     createmyProfile,
     getDetails,
     getAllProfiles,
+    updateProfile
 };
