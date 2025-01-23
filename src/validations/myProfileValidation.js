@@ -13,6 +13,7 @@ const createmyProfile = async (req , res , next )=> {
         location: Joi.string().max(40).allow(''),
         personality: Joi.array().items(Joi.string().max(50)).default([]),
         Introduction: Joi.string().max(100).allow(''),
+        updatedAt: Joi.date().timestamp('javascript').allow(null),
     });
 
     try {

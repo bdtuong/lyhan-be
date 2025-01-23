@@ -22,8 +22,9 @@ const getAllProfiles = async (req, res, next) => {
 
 const getDetails = async (req, res, next) => {
     try {
-        const userId = req.query.owner;
-        const myProfile = await myProfileService.getDetails(userId); // Gọi service để lấy chi tiết profile
+        const owner = req.params.owner;
+        console.log("Owner:", owner); // In ra owner
+        const myProfile = await myProfileService.getDetails(owner); // Gọi service để lấy chi tiết profile
         if (!myProfile) {
             throw new ApiError(StatusCodes.NOT_FOUND, 'Profile not found!');
         }
@@ -35,14 +36,15 @@ const getDetails = async (req, res, next) => {
 
 const updateProfile = async (req, res, next) => {
     try {
-        const userId = req.params.owner;
+        const owner = req.params.owner;
+        console.log("Owner trong controller:", owner); // In ra giá trị của owner
         const updatedProfile = req.body;
       // Validate updatedProfile using the same schema as for creating a profile
       const { error } = myProfileService.validateProfileData(updatedProfile); // Assuming you have a validation function in myProfileService
         if (error) {
         return res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({ message: error.details[0].message });
         }
-        const updated = await myProfileService.updateProfile(userId, updatedProfile);
+        const updated = await myProfileService.updateProfile(owner, updatedProfile);
         if (!updated) {
         throw new ApiError(StatusCodes.NOT_FOUND, 'Profile not found');
         }

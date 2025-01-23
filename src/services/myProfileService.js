@@ -10,7 +10,6 @@ const createmyProfile = async (reqBody) => {
         const myProfileData = {
             ...reqBody,
             slug: slugify(reqBody.username),
-            userId: new ObjectId(reqBody.owner),
         };
 
         // lưu vào database
@@ -34,9 +33,12 @@ const getAllProfiles = async () => {
     }
 };
 
-const getDetails = async (myProfileId) => {
+
+
+const getDetails = async (owner) => {
     try {
-        const myProfile = await myProfileModel.findOneById(new ObjectId(myProfileId));
+        const myProfile = await myProfileModel.getDetails(owner); 
+
         if (!myProfile) {
             throw new ApiError(StatusCodes.NOT_FOUND, 'myProfile not found!');
         }
@@ -46,9 +48,59 @@ const getDetails = async (myProfileId) => {
     }
 };
 
+// myProfileService.js
+const updateProfile = async (owner, updatedProfile) => {  
+    try {
+        console.log("Owner trong service:", owner); // In ra giá trị của owner
+
+        // Chuyển đổi owner sang ObjectId
+        if (typeof owner === 'string' && ObjectId.isValid(owner)) {
+        owner = new ObjectId(owner);
+        }
+
+      // Tìm profile dựa trên owner
+        const existingProfile = await myProfileModel.findOne({ owner: owner });  
+
+        if (!existingProfile) { 
+        throw new ApiError(StatusCodes.NOT_FOUND, 'Profile not found!'); 
+        } 
+
+        // Loại bỏ trường owner khỏi updatedProfile (nếu có)
+        const { owner: _owner, ...restOfUpdatedProfile } = updatedProfile; 
+
+        // Cập nhật profile
+        const updated = await myProfileModel.updateOne( 
+        { _id: existingProfile._id },   // Filter dựa trên _id của profile 
+        { $set: restOfUpdatedProfile }  // Cập nhật các trường trong updatedProfile 
+        ); 
+
+        if (!updated) { 
+        throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to update profile!'); 
+        } 
+
+        // Trả về profile đã cập nhật (nếu cần) 
+        return await myProfileModel.findOne({ _id: existingProfile._id });  
+    } catch (error) { 
+        throw error; 
+    } 
+};
+
+const validateProfileData = async (profileData) => {
+    try {
+        // Sử dụng schema MYPROFILE_COLLECTION_SCHEMA để validate
+        const { error } = await myProfileModel.validateBeforeCreate(profileData);
+        return { error }; // Trả về error nếu có
+    } catch (error) {
+        return { error }; // Trả về error nếu có
+    }
+};
+
+
 
 export const myProfileService = {
     createmyProfile,
     getDetails,
     getAllProfiles,
+    updateProfile,
+    validateProfileData
 };

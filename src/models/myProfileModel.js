@@ -6,7 +6,6 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 
 const MYPROFILE_COLLECTION_NAME = 'myprofiles'
 const MYPROFILE_COLLECTION_SCHEMA = Joi.object({
-    userId: Joi.required(),
     owner: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     username: Joi.string().required(),
     slug: Joi.string().trim().strict(),
@@ -32,6 +31,10 @@ const createmyProfile = async (data) => {
     try {
         const validData = await validateBeforeCreate(data)
         console.log('validData: ', validData)
+
+        //chuyển owner sang dạng ObjectId
+        validData.owner = new ObjectId(validData.owner); 
+
         const createdmyProfile = await GET_DB().collection(MYPROFILE_COLLECTION_NAME).insertOne(validData)
 
         return createdmyProfile
@@ -59,17 +62,29 @@ const getAllProfiles = async () => {
 
 const getDetails = async (owner) => {
     try {
-        return await GET_DB().collection(MYPROFILE_COLLECTION_NAME).findOne({
-            userId: new ObjectId(owner),
+        console.log("Owner:", owner); 
+
+        // Kiểm tra kiểu dữ liệu của owner
+        if (typeof owner !== 'string' || !owner.match(/^[0-9a-fA-F]{24}$/)) {
+            throw new Error('Invalid owner ID');
+        }
+
+        const query = {
+            owner: new ObjectId(owner),
             _destroy: false,
-        });
+        };
+        console.log("Query:", query); 
+
+        return await GET_DB().collection(MYPROFILE_COLLECTION_NAME).findOne(query);
     } catch (error) {
+        console.error("Lỗi trong getDetails:", error.stack); // In ra stack trace của lỗi
         throw new Error(`Error in getDetails: ${error.message}`);
     }
 };
 
 const updateOne = async (filter, update) => {
     try {
+
         return await GET_DB().collection(MYPROFILE_COLLECTION_NAME).updateOne(filter, update);
     } catch (error) {
         throw new Error(error);
