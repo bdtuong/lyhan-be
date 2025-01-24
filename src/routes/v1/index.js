@@ -6,7 +6,7 @@ import {UserRoute} from './UserRoute.js'
 import {boardCollectionRoute} from './boardCollectionRoute.js'
 import {CommentRoute} from './CommentRoute.js'
 import { myProfileRoute } from './myProfileRoute.js'
-
+import {CommentInclineRoute} from './commentInlineRoute.js'
 const Router = express.Router()
 
 //Check APIs v1/status
@@ -32,6 +32,7 @@ Router.use('/page',boardCollectionRoute)
 //myProfile APIs v1/myProfile
 Router.use('/myProfile',myProfileRoute)
 
-
+// comment inline
+Router.use('/commentinline',CommentInclineRoute)
 
 export const APIs_V1 = Router

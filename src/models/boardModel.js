@@ -3,6 +3,7 @@ import {ObjectId} from'mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 import { GET_DB } from '../config/mongodb.js'
 import { CommentModel } from './commentModel.js'
+import { CommentInlineModel } from './commentInlineModel.js'
 
 
 
@@ -72,6 +73,12 @@ const getDetails = async (id) => {
                         localField: '_id',
                         foreignField: 'boardID',
                         as: 'comments'
+                    } },
+                    {$lookup: {
+                        from: CommentInlineModel.COMMENT_COLLECTIONINLINE_NAME,
+                        localField: '_id',
+                        foreignField: 'boardID',
+                        as: 'commentsInline'
                     } }
                 ]).toArray()
         
