@@ -51,7 +51,8 @@ const getDetails = async (owner) => {
 // myProfileService.js
 const updateProfile = async (owner, updatedProfile) => {  
     try {
-        console.log("Owner trong service:", owner); // In ra giá trị của owner
+        // In ra owner để kiểm tra(để debug)
+        //console.log("Owner trong service:", owner);
 
         // Chuyển đổi owner sang ObjectId
         if (typeof owner === 'string' && ObjectId.isValid(owner)) {

@@ -14,7 +14,15 @@ const COMMENT_COLLECTION_SCHEMA = Joi.object({
     content: Joi.string().required().min(1),
     username: Joi.string().required(),
     slug: Joi.string().trim().strict(),
-
+    upvote: Joi.number().default(0),
+    downvote: Joi.number().default(0),
+    votes: Joi.array().items(
+        Joi.object({
+            userId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+            type: Joi.string().valid('up', 'down'),
+            createdAt: Joi.date().default(Date.now)
+        })
+    ).default([]),
 
     // bắt buộc 
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
@@ -67,12 +75,24 @@ const getDetails = async (id) => {
     }
 };
 
-
+const updateOneById = async (id, updateData) => {
+    try {
+        const result = await GET_DB().collection(COMMENT_COLLECTION_NAME).findOneAndUpdate(
+            { _id: new ObjectId(id) },
+            { $set: updateData },
+            { returnDocument: 'after' } // Trả về document sau khi đã cập nhật
+        );
+        return result.value; // Trả về document đã được cập nhật
+    } catch (error) {
+        throw new Error(error);
+    }
+};
 
 export const CommentModel = {
     COMMENT_COLLECTION_NAME,
     COMMENT_COLLECTION_SCHEMA,
     createComment,
     findOneById,
-    getDetails
+    getDetails,
+    updateOneById
 }

@@ -43,9 +43,33 @@ const deleteComment = async (req, res, next) => {
     }
 };
 
+
+const vote = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { type, userId } = req.body;
+
+        // In ra commentId để kiểm tra(sài để debug)
+        //console.log('commentId in controller (string):', id);
+
+        // Gọi hàm vote của CommentService với 3 tham số
+        const updatedComment = await CommentService.vote(id, userId, type); 
+
+        if (!updatedComment) {
+            return next(new ApiError(StatusCodes.NOT_FOUND, 'Comment not found'));
+        }
+
+        res.status(200).json(updatedComment);
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const CommentController = {
     createComment,
     getDetails,
     updateComment,
     deleteComment,
+    vote
 };

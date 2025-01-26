@@ -24,6 +24,21 @@ const createComment = async (req , res , next )=> {
     
 }
 
+const vote = async (req, res, next) => {
+    const correctCondition = Joi.object({
+        type: Joi.string().valid('up', 'down').required(),
+        userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+    });
+
+    try {
+        await correctCondition.validateAsync(req.body, { abortEarly: false });
+        next();
+    } catch (error) {
+        next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message));
+    }
+};
+
 export const CommentValidation = {
-    createComment
+    createComment,
+    vote
 }

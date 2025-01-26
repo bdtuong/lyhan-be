@@ -10,7 +10,7 @@ Router4.route('/')
 
 Router4.route('/:owner')
     .put(myProfileValidation.createmyProfile, myProfileController.updateProfile)
-    .get(myProfileController.getDetails) // Thêm route GET để lấy chi tiết profile
+    .get(myProfileController.getDetails)
 
 
 export const myProfileRoute = Router4

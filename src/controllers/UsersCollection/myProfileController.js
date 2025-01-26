@@ -23,7 +23,7 @@ const getAllProfiles = async (req, res, next) => {
 const getDetails = async (req, res, next) => {
     try {
         const owner = req.params.owner;
-        console.log("Owner:", owner); // In ra owner
+        //console.log("Owner:", owner); // In ra owner(để debug)
         const myProfile = await myProfileService.getDetails(owner); // Gọi service để lấy chi tiết profile
         if (!myProfile) {
             throw new ApiError(StatusCodes.NOT_FOUND, 'Profile not found!');

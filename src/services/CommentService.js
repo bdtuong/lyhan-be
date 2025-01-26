@@ -2,7 +2,6 @@ import { StatusCodes } from 'http-status-codes';
 import { CommentModel } from '../models/commentModel.js';
 import ApiError from '../utils/ApiError.js';
 import { ObjectId } from 'mongodb';
-import {AuthModel} from '../models/AuthModel.js';
 
 
 const createComment = async (reqBody) => {
@@ -71,10 +70,68 @@ const getSortedComments = async (postId) => {
     }
 };
 
+const vote = async (commentId, userId, voteType) => {
+    try {
+        // In ra commentId nhận được từ controller(sài để debug)
+        //console.log('commentId in service(string):', commentId); 
+
+        // Chuyển đổi commentId sang ObjectId
+        const commentObjectId = new ObjectId(commentId); 
+        const comment = await CommentModel.findOneById(commentObjectId);
+        if (!comment) throw new ApiError(StatusCodes.NOT_FOUND, 'Comment not found');
+
+        const existingVoteIndex = comment.votes.findIndex(v => v.userId === userId);
+
+        // Xử lý logic vote
+        let newVotes = [...comment.votes];
+        if (existingVoteIndex >= 0) {
+        // Nếu vote cùng loại - xóa vote
+        if (newVotes[existingVoteIndex].type === voteType) {
+            newVotes = newVotes.filter(v => v.userId !== userId);
+        } else {
+            // Thay đổi loại vote
+            newVotes[existingVoteIndex] = { 
+            userId, 
+            type: voteType,
+            createdAt: new Date().getTime()
+            };
+        }
+        } else {
+        // Thêm vote mới
+        newVotes.push({ userId, type: voteType, createdAt: new Date().getTime() });
+        }
+
+        // Tính toán upvote/downvote mới
+        const upvote = newVotes.filter(v => v.type === 'up').length;
+        const downvote = newVotes.filter(v => v.type === 'down').length;
+
+        // Cập nhật database
+        const updatedComment = await CommentModel.updateOneById(
+            new ObjectId(commentId),
+            { 
+                upvote,
+                downvote,
+                votes: newVotes,
+                updatedAt: new Date().getTime()
+            }
+        );
+
+        return updatedComment;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const getCommentsByPostId = async (postId) => {
+    return await CommentModel.findManyByPostId(new ObjectId(postId));
+};
+
 export const CommentService = {
     createComment,
     getDetails,
     updateComment,
     deleteComment,
     getSortedComments,
+    vote,
+    getCommentsByPostId,
 };

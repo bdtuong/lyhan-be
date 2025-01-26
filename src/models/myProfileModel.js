@@ -62,7 +62,8 @@ const getAllProfiles = async () => {
 
 const getDetails = async (owner) => {
     try {
-        console.log("Owner:", owner); 
+        // In ra owner để kiểm tra(để debug)
+        //console.log("Owner:", owner); 
 
         // Kiểm tra kiểu dữ liệu của owner
         if (typeof owner !== 'string' || !owner.match(/^[0-9a-fA-F]{24}$/)) {
