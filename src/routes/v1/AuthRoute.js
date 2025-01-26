@@ -22,6 +22,7 @@ Router1.route('/refresh-token')
 Router1.route('/logout')
     .post(AuthController.Logout)
 
-/*Router1.route('/changepassword')
-    .post(AuthValidation.changePassword,AuthController.changePassword)*/
+Router1.route('/change-password/:userId')
+    .put(AuthValidation.changePassword, AuthController.changePassword)
+
 export const AuthRoute = Router1

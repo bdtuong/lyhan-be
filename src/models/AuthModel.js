@@ -84,6 +84,30 @@ const getDetails = async (id) => {
     }
 }
 
+const updatePassword = async (userId, hashedPassword) => {
+    try {
+        const result = await GET_DB()
+            .collection(USER_COLLECTION_NAME)
+            .updateOne(
+                { _id: new ObjectId(userId) }, // Chuyển đổi userId thành ObjectId
+            {
+                $set: {
+                password: hashedPassword,
+                updatedAt: new Date().getTime(), // Cập nhật thời gian sửa đổi
+                },
+            }
+            );
+
+        if (!result.acknowledged) {
+            throw new Error('Update password failed');
+        }
+
+        return result;
+    } catch (error) {
+        throw error;
+    }
+};
+
 
 export const AuthModel = {
     USER_COLLECTION_NAME,
@@ -93,4 +117,5 @@ export const AuthModel = {
     getDetails,
     validateBeforeCreate,
     findOne,
+    updatePassword
 }

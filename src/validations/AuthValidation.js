@@ -48,36 +48,23 @@ const createNew = async (req , res , next )=> {
     
 }
 
-/*const changePassword = async (req, res, next) => {
-    const validationSchema = Joi.object({
-        oldPassword: Joi.string().required().min(8).trim().strict().messages({
-        'any.required': 'Old Password is required',
-        'string.empty': 'Old Password is not allowed to be empty',
-        'string.min': 'Old Password must be at least 8 characters long',
-        }),
-        newPassword: Joi.string().required().min(8).trim().strict().messages({
-        'any.required': 'New Password is required',
-        'string.empty': 'New Password is not allowed to be empty',
-        'string.min': 'New Password must be at least 8 characters long',
-        }),
-        confirmNewPassword: Joi.string().required().valid(Joi.ref('newPassword')).messages({
-        'any.required': 'Confirm New Password is required',
-        'string.empty': 'Confirm New Password is not allowed to be empty',
-        'any.only': 'Confirm New Password must match New Password',
-        }),
+const changePassword = async (req, res, next) => {
+    const correctCondition = Joi.object({
+        oldPassword: Joi.string().required().min(8).trim().strict(),
+        newPassword: Joi.string().required().min(8).trim().strict(),
+        confirmNewPassword: Joi.string().valid(Joi.ref('newPassword')).required()
     });
 
     try {
-        // Validate dữ liệu gửi lên
-        await validationSchema.validateAsync(req.body, { abortEarly: false });
+        await correctCondition.validateAsync(req.body, { abortEarly: false });
         next();
     } catch (error) {
-        next(new ApiError(422, new Error(error).message));
+        next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message));
     }
-};*/
+};
 
 
 export const AuthValidation = {
     createNew,
-    //changePassword
+    changePassword
 }

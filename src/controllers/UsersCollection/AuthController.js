@@ -5,6 +5,7 @@ import  ApiError  from '../../utils/ApiError.js'
 import { env } from '../../config/environment.js'
 import bcrypt from 'bcrypt'
 import  jwt  from 'jsonwebtoken'
+import { ObjectId } from 'mongodb'
 import { myProfileService } from '../../services/myProfileService.js'
 
 const createNew = async (req, res, next) => {
@@ -180,44 +181,27 @@ const Logout = async (req, res) => {
 //có thể xem BFF (Backend for Frontend) để xử lý vấn đề này
 
 
-/*const changePassword = async (req, res, next) => {
+const changePassword = async (req, res, next) => {
     try {
+        const { oldPassword, newPassword, confirmNewPassword } = req.body;
+        const userId = req.params.userId; // Lấy từ URL params
         
-        const { oldPassword, newPassword } = req.body;
-        const userId = req.user._id;  // Assuming you have JWT authorization and user is already authenticated
-
-        // Fetch the user from the database
-        const user = await UserModel.findOneById(userId);
-        if (!user) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+        // Kiểm tra userId có tồn tại và đúng định dạng không
+        if (!userId || !ObjectId.isValid(userId)) {
+            throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid userId");
         }
 
-        // Check if old password is correct
-        const isMatch = await bcrypt.compare(oldPassword, user.password);
-        if (!isMatch) {
-        throw new ApiError(StatusCodes.UNAUTHORIZED, 'Old password is incorrect');
-        }
+        // Chuyển đổi userId thành ObjectId
+        const objectId = new ObjectId(userId);
 
-        // Hash the new password and save to the database
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        // Gọi service để xử lý logic
+        const result = await AuthService.changePassword(objectId, oldPassword, newPassword, confirmNewPassword);
 
-        user.password = hashedPassword;
-        user.updatedAt = new Date();
-        const updatedUser =await user.save();
-
-
-        // Remove password from the response
-        const { password, ...userWithoutPassword } = updatedUser.toObject();
-
-        res.status(StatusCodes.OK).json({
-            message: 'Password changed successfully',
-            user: userWithoutPassword,
-        });
+        res.status(StatusCodes.OK).json(result);
     } catch (error) {
         next(error);
     }
-};*/
+};
 
 export const AuthController = {
     createNew,
@@ -225,5 +209,5 @@ export const AuthController = {
     LoginUser,
     requestRefreshToken,
     Logout,
-    //changePassword
+    changePassword
 }
