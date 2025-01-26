@@ -37,7 +37,7 @@ const getDetails = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
     try {
         const owner = req.params.owner;
-        console.log("Owner trong controller:", owner); // In ra giá trị của owner
+        //console.log("Owner trong controller:", owner); // In ra giá trị của owner (để debug)
         const updatedProfile = req.body;
       // Validate updatedProfile using the same schema as for creating a profile
       const { error } = myProfileService.validateProfileData(updatedProfile); // Assuming you have a validation function in myProfileService
