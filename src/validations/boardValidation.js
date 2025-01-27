@@ -28,6 +28,14 @@ const createNew = async (req , res , next )=> {
         .messages({
             'string.pattern.base': 'Invalid boardCollectionID format',
         }),
+        boardshareCollectionID: Joi.array()
+        .items(Joi.string().pattern(OBJECT_ID_RULE))
+        .default([]) // Giá trị mặc định là một mảng rỗng
+        .messages({
+            'array.base': 'boardCollectionID must be an array',
+            'string.pattern.base': 'Invalid boardCollectionID format',
+        }),
+
 
 
     })
