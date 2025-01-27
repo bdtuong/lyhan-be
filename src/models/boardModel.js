@@ -24,7 +24,15 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
             }
         })
         .default(new ObjectId('677e53f474f256608d6044a2')),
-
+        userShareCollectionID: Joi.array()
+        .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE).custom((value, helpers) => {
+            try {
+                return new ObjectId(value); // Chuyển thành ObjectId
+            } catch (error) {
+                return helpers.error('any.invalid');
+            }
+        }))
+        .default([]),
     description: Joi.string().required().min(3).trim(),
     content: Joi.string().required(),
 

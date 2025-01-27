@@ -26,6 +26,25 @@ const getDetails = async (req, res, next) => {
     }
 }
 
+const shareBoard = async (req, res, next) => {
+    try {
+        const { boardId, userCollectionID } = req.body;
+
+        // Kiểm tra dữ liệu đầu vào
+        if (!boardId || !userCollectionID) {
+            throw new ApiError(StatusCodes.BAD_REQUEST, 'Board ID và User Collection ID là bắt buộc');
+        }
+
+        // Gọi service để chia sẻ board
+        const result = await boardService.shareBoard(boardId, userCollectionID);
+
+        // Trả về kết quả
+        res.status(StatusCodes.OK).json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 
 
@@ -35,6 +54,7 @@ const getDetails = async (req, res, next) => {
 
 export const boardController = {
     createNew,
-    getDetails
+    getDetails,
+    shareBoard
     
 }

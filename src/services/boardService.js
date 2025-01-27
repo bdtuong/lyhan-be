@@ -53,8 +53,38 @@ const getSortedBoard = async (id) => {
     }
 }
 
+const shareBoard = async (boardId, userCollectionID) => {
+    try {
+        // Tìm board theo ID
+        const board = await GET_DB().collection('boards').findOne({ _id: new ObjectId(boardId) });
+        if (!board) {
+            throw new Error('Board không tồn tại');
+        }
+
+        // Kiểm tra xem userCollectionID đã có trong mảng chưa
+        if (board.userShareCollectionID.includes(userCollectionID)) {
+            throw new Error('User đã chia sẻ board này rồi');
+        }
+
+        // Cập nhật mảng userShareCollectionID
+        const result = await GET_DB().collection('boards').updateOne(
+            { _id: new ObjectId(boardId) },
+            { $push: { userShareCollectionID: userCollectionID } }
+        );
+
+        if (result.modifiedCount === 0) {
+            throw new Error('Không thể chia sẻ board');
+        }
+
+        return { message: 'Chia sẻ board thành công' };
+    } catch (error) {
+        throw error;
+    }
+};
+
 
 export const boardService  ={
     createNew,
-    getDetails
+    getDetails,
+    shareBoard
 }
