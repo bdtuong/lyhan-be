@@ -123,7 +123,7 @@ const updateSharedPosts = async (userId, boardId) => {
             .updateOne(
                 { _id: new ObjectId(userId) },
                 {
-                    $push: { sharedPosts: new ObjectId(boardId) },
+                    $addToSet: { sharedPosts: new ObjectId(boardId) },
                     $set: { updatedAt: new Date().getTime() }
                 }
             );

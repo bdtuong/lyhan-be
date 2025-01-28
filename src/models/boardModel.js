@@ -104,7 +104,7 @@ const updateUserShare = async (boardId, userId) => {
             .updateOne(
                 { _id: new ObjectId(boardId) },
                 {
-                    $push: { userShareCollectionID: new ObjectId(userId) }, 
+                    $addToSet: { userShareCollectionID: new ObjectId(userId) }, 
                     $set: { updatedAt: new Date().getTime() }
                 }
             );
