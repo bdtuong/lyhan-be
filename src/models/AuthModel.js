@@ -116,6 +116,28 @@ const updatePassword = async (userId, hashedPassword) => {
     }
 };
 
+const updateSharedPosts = async (userId, boardId) => {
+    try {
+        const result = await GET_DB()
+            .collection(USER_COLLECTION_NAME)
+            .updateOne(
+                { _id: new ObjectId(userId) },
+                {
+                    $push: { sharedPosts: new ObjectId(boardId) },
+                    $set: { updatedAt: new Date().getTime() }
+                }
+            );
+
+        if (!result.acknowledged) {
+            throw new Error('Update shared posts failed');
+        }
+
+        return result;
+    } catch (error) {
+        throw error;
+    }
+};
+
 
 export const AuthModel = {
     USER_COLLECTION_NAME,
@@ -125,5 +147,6 @@ export const AuthModel = {
     getDetails,
     validateBeforeCreate,
     findOne,
-    updatePassword
+    updatePassword,
+    updateSharedPosts
 }

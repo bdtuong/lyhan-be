@@ -68,6 +68,7 @@ const findOneById = async (id) => {
     }
 }
 
+// lay board da dc phan loai theo thoi gian
 const getDetails = async (id) => {
     try {
                // return await GET_DB().collection(USER_COLLECTION_NAME).findOne({_id: new ObjectId(id)})
@@ -95,7 +96,30 @@ const getDetails = async (id) => {
         throw new Error(error)
     }
 }
-// lay board da dc phan loai theo thoi gian
+
+const updateUserShare = async (boardId, userId) => {
+    try {
+        const result = await GET_DB()
+            .collection(BOARD_COLLECTION_NAME)
+            .updateOne(
+                { _id: new ObjectId(boardId) },
+                {
+                    $push: { userShareCollectionID: new ObjectId(userId) }, 
+                    $set: { updatedAt: new Date().getTime() }
+                }
+            );
+
+        if (!result.acknowledged) {
+            throw new Error('Update user share failed');
+        }
+
+        return result;
+    } catch (error) {
+        throw error;
+    }
+};
+
+
 
 
 export const boardModel = {
@@ -103,6 +127,7 @@ export const boardModel = {
     BOARD_COLLECTION_SCHEMA,
     createNew,
     findOneById,
-    getDetails
+    getDetails,
+    updateUserShare
     
 }
