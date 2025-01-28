@@ -53,7 +53,7 @@ const findOneById = async (id) => {
 // bat dau join data tai day
 const getDetails = async (id) => {
     try {
-   
+
         const result = await GET_DB().collection(BOARDC_COLLECTION_NAME).aggregate([
             {$match: {
                 _id: new ObjectId(id),

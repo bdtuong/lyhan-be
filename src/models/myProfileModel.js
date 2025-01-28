@@ -74,7 +74,8 @@ const getDetails = async (owner) => {
             owner: new ObjectId(owner),
             _destroy: false,
         };
-        console.log("Query:", query); 
+        // In ra query để kiểm tra(để debug)
+        //console.log("Query:", query); 
 
         return await GET_DB().collection(MYPROFILE_COLLECTION_NAME).findOne(query);
     } catch (error) {

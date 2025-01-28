@@ -14,7 +14,8 @@ const USER_COLLECTION_SCHEMA = Joi.object({
     userID: Joi.string().required().min(6).max(30).trim().strict(),
     password: Joi.string().required().min(8).trim().strict(),
     confirmPassword: Joi.string().required().valid(Joi.ref('password')).strict(),
-    userCollectionID:Joi.string(),
+    sharedPosts: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([]),
+    //userCollectionID:Joi.string(),
     admin: Joi.boolean().default(false),
     slug: Joi.string().required().trim().strict(),
     
@@ -35,9 +36,11 @@ const createNew = async (data) => {
         const validData = await validateBeforeCreate(data)
         validData.password = await bcrypt.hash(validData.password, 10)
         delete validData.confirmPassword
+        
+        //chuyển _id thành ObjectId rồi gán vô userId để sài
         const userId = new ObjectId();
         validData._id = userId;
-        validData.userCollectionID = userId;
+        //validData.userCollectionID = userId;
 
 
         console.log('validData: ', validData)
