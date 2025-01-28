@@ -16,6 +16,9 @@ Router.route('/:id')
 Router.route('/:boardId/share')
     .post(boardController.shareBoard);
 
+Router.route('/details')
+    .post(boardController.getSharedPostsDetails); 
+
 
     export const boardRoute = Router
 

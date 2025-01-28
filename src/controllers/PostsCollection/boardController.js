@@ -66,13 +66,23 @@ const shareBoard = async (req, res, next) => {
     }
 };
 
-
+const getSharedPostsDetails = async (req, res, next) => {
+    try {
+        const { boardIds } = req.body;
+        const posts = await Promise.all(
+            boardIds.map(boardId => boardService.getDetails(boardId))
+        );
+        res.status(StatusCodes.OK).json(posts);
+    } catch (error) {
+        next(error);
+    }
+};
 
 
 
 export const boardController = {
     createNew,
     getDetails,
-    shareBoard
-    
+    shareBoard,
+    getSharedPostsDetails
 }
