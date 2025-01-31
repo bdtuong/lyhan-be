@@ -22,6 +22,7 @@ const createNew = async (req , res , next )=> {
         }),
         userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
         content: Joi.string().required(),
+        username: Joi.string().required(),
         boardCollectionID: Joi.string()
         .pattern(OBJECT_ID_RULE)
         .default('677e53f474f256608d6044a2') // Gán giá trị mặc định
