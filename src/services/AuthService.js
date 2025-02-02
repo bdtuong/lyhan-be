@@ -38,7 +38,10 @@ const getDetails = async (Userid) => {
             throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
         }
         
-        return User
+        const userData = User._doc || User; // Handle cases where _doc might be missing
+        const { password,userID,slug,admin,createdAt,updatedAt, _destroy, ...UsertoUI } = userData;
+
+        return UsertoUI
     } 
     
     catch (error) { throw error }

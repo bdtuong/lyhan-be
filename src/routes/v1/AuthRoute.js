@@ -16,8 +16,8 @@ Router1.route('/login')
     .post(AuthController.LoginUser)
     .put
 
-Router1.route('/refresh-token')
-    .post(AuthController.requestRefreshToken)
+// Router1.route('/refresh-token')
+//     .post(AuthController.requestRefreshToken)
 
 Router1.route('/logout')
     .post(AuthController.Logout)

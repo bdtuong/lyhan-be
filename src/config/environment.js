@@ -9,7 +9,7 @@ export const env = {
     APP_PORT: process.env.APP_PORT,
 
     JWT_ACCESS_TOKEN_SECRET: process.env.JWT_ACCESS_TOKEN_SECRET,
-    JWT_REFRESH_TOKEN_SECRET: process.env.JWT_REFRESH_TOKEN_SECRET,
+    //JWT_REFRESH_TOKEN_SECRET: process.env.JWT_REFRESH_TOKEN_SECRET,
 
     BUILD_MODE: process.env.BUILD_MODE,
     

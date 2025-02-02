@@ -19,10 +19,14 @@ const createNew = async (req, res, next) => {
             username: req.body.username,
             owner: createdUser._id.toString(), 
         };
-        await myProfileService.createmyProfile(profileData);           
+        await myProfileService.createmyProfile(profileData);    
+        
+        // Tạo access token
+        const access_token = GenerateAccessToken(createdUser);
+
 
         //có kết quả thì trả về Client
-        res.status(StatusCodes.CREATED).json(createdUser)
+        res.status(StatusCodes.CREATED).json({access_token})
 
 
     } catch (error) {
@@ -32,28 +36,28 @@ const createNew = async (req, res, next) => {
 
 
 //khi login sẽ push refresh token vào mảng
-let refresh_tokens = [1]
+//let refresh_tokens = [1]
 
 
 const GenerateAccessToken = (User) => {
     return jwt.sign({
         id: User._id,
-        admin: User.admin
+        admin: User.admin,
     },
     env.JWT_ACCESS_TOKEN_SECRET,
     {expiresIn: '1m'}
     )
 }
 
-const GenerateRefreshToken = (User) => {
-    return jwt.sign({
-        id: User._id,
-        admin: User.admin
-    },
-    env.JWT_REFRESH_TOKEN_SECRET,
-    {expiresIn: '365d'}
-    )
-}
+// const GenerateRefreshToken = (User) => {
+//     return jwt.sign({
+//         id: User._id,
+//         admin: User.admin
+//     },
+//     env.JWT_REFRESH_TOKEN_SECRET,
+//     {expiresIn: '365d'}
+//     )
+// }
 
 const LoginUser = async (req, res, next) => {
     try {
@@ -73,24 +77,24 @@ const LoginUser = async (req, res, next) => {
 
         if(User && ValidPassword){
         const access_token = GenerateAccessToken(User);
-        const refreshtoken = GenerateRefreshToken(User);
+        //const refreshtoken = GenerateRefreshToken(User);
 
         // Store the refresh token
-        refresh_tokens.push(refreshtoken);
+        // refresh_tokens.push(refreshtoken);
         // Set the refresh token as a cookie
-        res.cookie('refreshtoken', refreshtoken, {
-            httpOnly: true,
-            path: '/refreshtoken',
-            secure: false, // Set to true in production
-            sameSite: 'strict', // Prevent CSRF
-        });
+        // res.cookie('refreshtoken', refreshtoken, {
+        //     httpOnly: true,
+        //     path: '/refreshtoken',
+        //     secure: false, // Set to true in production
+        //     sameSite: 'strict', // Prevent CSRF
+        // });
         
 
         // Prepare the response without exposing the user's password
-        const userData = User._doc || User; // Handle cases where _doc might be missing
-        const { password, ...UserWithoutPassword } = userData;
+        // const userData = User._doc || User; // Handle cases where _doc might be missing
+        // const { password,userID,slug,admin,createdAt,updatedAt, _destroy, ...UsertoUI } = userData;
         res.status(StatusCodes.OK).json({
-            ...UserWithoutPassword,
+            // ...UsertoUI,
             access_token,
         });
     }
@@ -101,49 +105,49 @@ const LoginUser = async (req, res, next) => {
 
 
 //Reset lại access token, refresh token khi hết hạn
-const requestRefreshToken = async (req, res, next) => {
-    try {
-        //Lấy refresh token từ cookies hoặc headers
-        const refreshtoken = req.cookies?.refreshtoken || req.headers['authorization']?.split(' ')[1]; 
+// const requestRefreshToken = async (req, res, next) => {
+//     try {
+//         //Lấy refresh token từ cookies hoặc headers
+//         const refreshtoken = req.cookies?.refreshtoken || req.headers['authorization']?.split(' ')[1]; 
 
-        if (!refreshtoken) {
-            throw new ApiError(StatusCodes.UNAUTHORIZED, 'No refresh token');
-        }
+//         if (!refreshtoken) {
+//             throw new ApiError(StatusCodes.UNAUTHORIZED, 'No refresh token');
+//         }
 
-        //Kiểm tra xem refresh token có hợp lệ không
-        if (!refresh_tokens.includes(refreshtoken)) {
-            throw new ApiError(StatusCodes.UNAUTHORIZED, 'Refresh token is not valid');
-        }
+//         //Kiểm tra xem refresh token có hợp lệ không
+//         if (!refresh_tokens.includes(refreshtoken)) {
+//             throw new ApiError(StatusCodes.UNAUTHORIZED, 'Refresh token is not valid');
+//         }
 
-        //Verify refresh token
-        jwt.verify(refreshtoken, process.env.JWT_REFRESH_TOKEN_SECRET, (err, User) => {
-            if (err) {
-                throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid refresh token');
-            }
+//         //Verify refresh token
+//         jwt.verify(refreshtoken, process.env.JWT_REFRESH_TOKEN_SECRET, (err, User) => {
+//             if (err) {
+//                 throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid refresh token');
+//             }
 
-            //Remove old refresh token
-            refresh_tokens = refresh_tokens.filter(token => token !== refreshtoken);
+//             //Remove old refresh token
+//             refresh_tokens = refresh_tokens.filter(token => token !== refreshtoken);
 
-            //Tạo access token và refresh token mới
-            const new_access_token = GenerateAccessToken(User);
-            const new_refreshtoken = GenerateRefreshToken(User);
+//             //Tạo access token và refresh token mới
+//             const new_access_token = GenerateAccessToken(User);
+//             const new_refreshtoken = GenerateRefreshToken(User);
 
-            refresh_tokens.push(new_refreshtoken); // Update refresh tokens
+//             refresh_tokens.push(new_refreshtoken); // Update refresh tokens
 
-            //Set refresh token cookie
-            res.cookie('refreshtoken', new_refreshtoken, {
-                httpOnly: true,
-                path: '/refreshtoken',
-                secure: process.env.NODE_ENV === 'production',  // Deploy server cần set true
-                sameSite: "strict" 
-            });
+//             //Set refresh token cookie
+//             res.cookie('refreshtoken', new_refreshtoken, {
+//                 httpOnly: true,
+//                 path: '/refreshtoken',
+//                 secure: process.env.NODE_ENV === 'production',  // Deploy server cần set true
+//                 sameSite: "strict" 
+//             });
 
-            res.status(StatusCodes.OK).json({ new_access_token });
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+//             res.status(StatusCodes.OK).json({ new_access_token });
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 
 
 const getDetails = async (req, res, next) => {
@@ -159,14 +163,14 @@ const getDetails = async (req, res, next) => {
 }
 
 const Logout = async (req, res) => {
-    res.clearCookie('refreshtoken', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: "strict",
-        path: "/",
-    })
-    //lọc ra refresh token tồn tại
-    refresh_tokens = refresh_tokens.filter(token => token !== req.cookies.refreshtoken)
+    // res.clearCookie('refreshtoken', {
+    //     httpOnly: true,
+    //     secure: process.env.NODE_ENV === 'production',
+    //     sameSite: "strict",
+    //     path: "/",
+    // })
+    // //lọc ra refresh token tồn tại
+    // refresh_tokens = refresh_tokens.filter(token => token !== req.cookies.refreshtoken)
     res.status(StatusCodes.OK).json({message: 'Logout success'})
 }
 
@@ -207,7 +211,7 @@ export const AuthController = {
     createNew,
     getDetails,
     LoginUser,
-    requestRefreshToken,
+    //requestRefreshToken,
     Logout,
     changePassword
 }

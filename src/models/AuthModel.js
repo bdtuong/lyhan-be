@@ -43,7 +43,7 @@ const createNew = async (data) => {
         //validData.userCollectionID = userId;
 
 
-        console.log('validData: ', validData)
+        //console.log('validData: ', validData) //log ra validData(để debug)
         const createdUser = await GET_DB().collection(USER_COLLECTION_NAME).insertOne(validData)
 
         return createdUser
