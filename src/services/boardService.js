@@ -85,7 +85,6 @@ const shareBoard = async (boardId, userCollectionID) => {
 const getIsShared = async (boardId, userId) => {
     try {
         const board = await boardModel.findOneById(boardId);
-        console.log('board trong getIsShared: ', board);//log ra board(để debug)
         const isShared = board.userShareCollectionID.includes(userId);
         if (isShared) {
             isShared = true;
