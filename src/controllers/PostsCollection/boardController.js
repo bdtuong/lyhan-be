@@ -78,25 +78,10 @@ const getSharedPostsDetails = async (req, res, next) => {
     }
 };
 
-const getIsShared = async (req, res, next) => {
-    try {
-        const boardId = req.params.boardId;
-        const userId = req.params.userId;
-
-        const isShared = await boardService.getIsShared(boardId, userId);
-
-        res.status(StatusCodes.OK).json({ isShared });
-    } catch (error) {
-        next(error);
-        
-    }
-}
-
 
 export const boardController = {
     createNew,
     getDetails,
     shareBoard,
     getSharedPostsDetails,
-    getIsShared
 }
