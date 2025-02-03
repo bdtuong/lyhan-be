@@ -25,4 +25,10 @@ Router1.route('/logout')
 Router1.route('/change-password/:userId')
     .put(AuthValidation.changePassword, AuthController.changePassword)
 
+Router1.route('/forgot-password')
+    .post(AuthController.forgotPassword)
+
+Router1.route('/reset-password/:token')
+    .post(AuthController.resetPassword); // Thêm route mới  
+
 export const AuthRoute = Router1

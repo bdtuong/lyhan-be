@@ -13,12 +13,11 @@ const createNew = async (req , res , next )=> {
             'string.max': 'Username must be at mos 20t characters long',
             'string.trim': 'Username must not have leading or trailing whitespace'
         }),
-        userID: Joi.string().required().min(6).max(30).trim().strict().messages({
-            'any.required': 'UserID is required',
-            'string.empty': 'UserID is not allowed to be empty',
-            'string.min': 'UserID must be at least 6 characters long',
-            'string.max': 'UserID must be at most 30 characters long',
-            'string.trim': 'UserID must not have leading or trailing whitespace',
+        email: Joi.string().required().email().trim().strict().messages({
+            'any.required': 'Email is required',
+            'string.empty': 'Email is not allowed to be empty',
+            'string.email': 'Email is not valid',
+            'string.trim': 'Email must not have leading or trailing whitespace'
         }),
         password: Joi.string().required().min(8).trim().strict().messages({
             'any.required': 'Password is required',

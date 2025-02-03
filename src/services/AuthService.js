@@ -3,16 +3,40 @@ import { AuthModel } from '../models/AuthModel.js'
 import ApiError from '../utils/ApiError.js'
 import { slugify } from '../utils/formatters.js'
 import bcrypt from 'bcrypt'
+import dns from 'dns'
+import crypto from 'crypto-browserify';
+import { GET_DB } from '../config/mongodb.js'
+import { ObjectId } from 'mongodb'
+
+const validateEmailDomain = (email) => {
+    const [emailname, domain] = email.split('@');
+    return new Promise((resolve, reject) => {
+        dns.resolveMx(domain, (err, addresses) => {
+        if (err) {
+          resolve(false); // Tên miền không tồn tại
+        } else {
+          resolve(true); // Tên miền tồn tại
+        }
+        });
+    });
+};
 
 const createNew = async (reqBody) => {
     try{
         if (!reqBody || !reqBody.username) {
             throw new Error('Username is required');
         }
-        const existingUser = await AuthModel.findOne({ userID: reqBody.userID });
+        const existingUser = await AuthModel.findOne({ email: reqBody.email });
         if (existingUser) {
-            throw new ApiError(StatusCodes.CONFLICT, 'UserID already exists');
+            throw new ApiError(StatusCodes.CONFLICT, 'Email already exists in the database');
         }
+
+        // Kiểm tra tên miền email
+        const isDomainValid = await validateEmailDomain(reqBody.email); // Kiểm tra tên miền email
+        if (!isDomainValid) {
+            throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid email domain');
+        }
+
         // xử lý logic dữ liệu tùy đặc thù dự án
         const newUser = {
             ...reqBody,
@@ -39,7 +63,7 @@ const getDetails = async (Userid) => {
         }
         
         const userData = User._doc || User; // Handle cases where _doc might be missing
-        const { password,userID,slug,admin,createdAt,updatedAt, _destroy, ...UsertoUI } = userData;
+        const { password,slug,admin,createdAt,updatedAt, _destroy, ...UsertoUI } = userData;
 
         return UsertoUI
     } 
@@ -78,8 +102,74 @@ const changePassword = async (userId, oldPassword, newPassword) => {
     }
 };
 
+const generateResetPasswordToken = async (email) => {
+    try {
+        const user = await AuthModel.findOne({ email });
+        if (!user) {
+            throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+        }
+
+        const resetToken = crypto.randomBytes(32).toString('hex'); // Tạo token ngẫu nhiên
+
+        // Cập nhật document trong MongoDB
+        await GET_DB().collection(AuthModel.USER_COLLECTION_NAME).updateOne(
+            { _id: new ObjectId(user._id) }, // Điều kiện lọc
+            {
+                $set: {
+                    resetPasswordToken: resetToken,
+                    resetPasswordExpires: Date.now() + 3600000 // Token hết hạn sau 1 giờ
+                }
+            }
+        );
+
+        return resetToken;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const resetPassword = async (token, password, confirmPassword) => {
+    try {
+        // Tìm user theo token và kiểm tra thời gian hết hạn
+        const user = await GET_DB().collection(AuthModel.USER_COLLECTION_NAME).findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid or expired token');
+        }
+
+        // Kiểm tra mật khẩu và xác nhận mật khẩu
+        if (password!== confirmPassword) {
+            throw new ApiError(StatusCodes.BAD_REQUEST, 'Passwords do not match');
+        }
+
+        // Hash mật khẩu mới
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Cập nhật mật khẩu và reset token trong MongoDB
+        await GET_DB().collection(AuthModel.USER_COLLECTION_NAME).updateOne(
+            { _id: new ObjectId(user._id) }, // Điều kiện lọc
+            {
+                $set: {
+                    password: hashedPassword,
+                    resetPasswordToken: null,
+                    resetPasswordExpires: null
+                }
+            }
+        );
+    } catch (error) {
+        throw error;
+    }
+};
+
+
 export const AuthService  ={
     createNew,
     getDetails,
-    changePassword
+    changePassword,
+    validateEmailDomain,
+    generateResetPasswordToken,
+    resetPassword
 }

@@ -11,16 +11,19 @@ import { boardModel } from './boardModel.js'
 const USER_COLLECTION_NAME = 'Users'
 const USER_COLLECTION_SCHEMA = Joi.object({
     username: Joi.string().required().min(6).max(20).trim().strict(),
-    userID: Joi.string().required().min(6).max(30).trim().strict(),
+    email: Joi.string().required().email().trim().strict(),
     password: Joi.string().required().min(8).trim().strict(),
     confirmPassword: Joi.string().required().valid(Joi.ref('password')).strict(),
     sharedPosts: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([]),
-    //userCollectionID:Joi.string(),
     admin: Joi.boolean().default(false),
     slug: Joi.string().required().trim().strict(),
     
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),
+
+    resetPasswordToken: Joi.string().default(null),
+    resetPasswordExpires: Joi.date().timestamp('javascript').default(null),
+    
     _destroy: Joi.boolean().default(false)
 })
 
@@ -137,6 +140,8 @@ const updateSharedPosts = async (userId, boardId) => {
         throw error;
     }
 };
+
+
 
 
 export const AuthModel = {

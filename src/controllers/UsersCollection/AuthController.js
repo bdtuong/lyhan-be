@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt'
 import  jwt  from 'jsonwebtoken'
 import { ObjectId } from 'mongodb'
 import { myProfileService } from '../../services/myProfileService.js'
+import nodemailer from 'nodemailer'
 
 const createNew = async (req, res, next) => {
     try {
@@ -45,7 +46,7 @@ const GenerateAccessToken = (User) => {
         admin: User.admin,
     },
     env.JWT_ACCESS_TOKEN_SECRET,
-    {expiresIn: '1m'}
+    {expiresIn: '15m'}
     )
 }
 
@@ -61,10 +62,10 @@ const GenerateAccessToken = (User) => {
 
 const LoginUser = async (req, res, next) => {
     try {
-        const { userID, password: inputPassword } = req.body;
+        const { email, password: inputPassword } = req.body;
 
         // Find the user by userID
-        const User = await AuthModel.findOne({ userID });
+        const User = await AuthModel.findOne({ email });
         if (!User) {
             throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
         }
@@ -207,11 +208,62 @@ const changePassword = async (req, res, next) => {
     }
 };
 
+const forgotPassword = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        const resetToken = await AuthService.generateResetPasswordToken(email); 
+
+        // Tạo transporter
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'minhnguyencong332@gmail.com',
+                pass: '1234578910'
+            }
+        });
+
+        // Tạo nội dung email
+        const mailOptions = {
+            from: 'minhnguyencong332@gmail.com', 
+            to: email,
+            subject: 'Password Reset Request',
+            html: `
+                <p>You are receiving this email because you (or someone else) has requested the reset of the password for your account.</p>
+                <p>Please click on the following link, or paste this into your browser to complete the process:</p>
+                <a href="${process.env.FRONTEND_URL}/reset-password/${resetToken}">${process.env.FRONTEND_URL}/reset-password/${resetToken}</a>
+                <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+            `
+        };
+
+        // Gửi email
+        await transporter.sendMail(mailOptions);
+
+        res.status(StatusCodes.OK).json({ message: 'Password reset email sent' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const resetPassword = async (req, res, next) => {
+    try {
+        const { token } = req.params;
+        const { password, confirmPassword } = req.body;
+
+        await AuthService.resetPassword(token, password, confirmPassword);
+
+        res.status(StatusCodes.OK).json({ message: 'Password reset successfully' });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const AuthController = {
     createNew,
     getDetails,
     LoginUser,
     //requestRefreshToken,
     Logout,
-    changePassword
+    changePassword,
+    forgotPassword,
+    resetPassword
 }
