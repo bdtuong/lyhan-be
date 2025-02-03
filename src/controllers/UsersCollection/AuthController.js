@@ -217,14 +217,14 @@ const forgotPassword = async (req, res, next) => {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: 'minhnguyencong332@gmail.com',
-                pass: '1234578910'
+                user: 'chuaco@gmail.com',
+                pass: 'null'
             }
         });
 
         // Tạo nội dung email
         const mailOptions = {
-            from: 'minhnguyencong332@gmail.com', 
+            from: 'chuaco@gmail.com', 
             to: email,
             subject: 'Password Reset Request',
             html: `
