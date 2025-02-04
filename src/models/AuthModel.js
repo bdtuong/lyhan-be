@@ -16,13 +16,13 @@ const USER_COLLECTION_SCHEMA = Joi.object({
     confirmPassword: Joi.string().required().valid(Joi.ref('password')).strict(),
     sharedPosts: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([]),
     //userCollectionID:Joi.string(),
+    savedPosts: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([]),
     admin: Joi.boolean().default(false),
     slug: Joi.string().required().trim().strict(),
     
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),
     _destroy: Joi.boolean().default(false),
-    savedPosts: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([]),
 })
 
 const validateBeforeCreate = async (data) => {

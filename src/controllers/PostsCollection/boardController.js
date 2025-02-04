@@ -78,10 +78,40 @@ const getSharedPostsDetails = async (req, res, next) => {
     }
 };
 
+const saveBoard = async (req, res, next) => {
+    try {
+        const { boardId } = req.params;
+        const { userId } = req.body; // Lấy userId từ body
+
+        //console.log('boardId trong boardController: ', boardId);//log ra boardId(để debug)
+        //console.log('userId: ', userId);//log ra userId(để debug)
+
+        // Gọi model để cập nhật userShareCollectionID và sharedPosts
+        await AuthModel.updateSavedPosts(userId, boardId);
+
+        res.status(StatusCodes.OK).json({ message: 'Lưu bài viết thành công' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getSavedPostsDetails = async (req, res, next) => {
+    try {
+        const { boardIds } = req.body;
+        const posts = await Promise.all(
+            boardIds.map(boardId => boardService.getDetails(boardId))
+        );
+        res.status(StatusCodes.OK).json(posts);
+    } catch (error) {
+        next(error);
+    }
+};
 
 export const boardController = {
     createNew,
     getDetails,
     shareBoard,
     getSharedPostsDetails,
+    saveBoard,
+    getSavedPostsDetails,
 }
