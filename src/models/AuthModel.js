@@ -21,7 +21,8 @@ const USER_COLLECTION_SCHEMA = Joi.object({
     
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),
-    _destroy: Joi.boolean().default(false)
+    _destroy: Joi.boolean().default(false),
+    savedPosts: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([]),
 })
 
 const validateBeforeCreate = async (data) => {
@@ -138,6 +139,28 @@ const updateSharedPosts = async (userId, boardId) => {
     }
 };
 
+const updateSavedPosts = async (userId, boardId) => {
+    try {
+        const result = await GET_DB()
+            .collection(USER_COLLECTION_NAME)
+            .updateOne(
+                { _id: new ObjectId(userId) },
+                {
+                    $addToSet: { savedPosts: new ObjectId(boardId) },
+                    $set: { updatedAt: new Date().getTime() }
+                }
+            );
+
+        if (!result.acknowledged) {
+            throw new Error('Update saved posts failed');
+        }
+
+        return result;
+    } catch (error) {
+        throw error;
+    }
+};
+
 
 export const AuthModel = {
     USER_COLLECTION_NAME,
@@ -148,5 +171,6 @@ export const AuthModel = {
     validateBeforeCreate,
     findOne,
     updatePassword,
-    updateSharedPosts
+    updateSharedPosts,
+    updateSavedPosts,
 }
