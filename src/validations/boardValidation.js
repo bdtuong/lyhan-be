@@ -20,6 +20,13 @@ const createNew = async (req , res , next )=> {
             'string.max': 'description must be at most 50 characters long',
             'string.trim': 'description must not have leading or trailing whitespace'
         }),
+        language: Joi.string().required().min(3).trim().messages({
+            'any.required': 'description is required',
+            'string.empty': 'description is not allowed to be empty',
+            'string.min': 'description must be at least 3 characters long',
+            'string.max': 'description must be at most 50 characters long',
+            'string.trim': 'description must not have leading or trailing whitespace'
+        }),
         userId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
         content: Joi.string().required(),
         username: Joi.string().required(),
