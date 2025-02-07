@@ -6,7 +6,7 @@ import exitHook from "async-exit-hook"
 import { CONNECT_DB, GET_DB, CLOSE_DB } from './config/mongodb.js'
 import { env } from './config/environment.js'
 import {APIs_V1} from './routes/v1/index.js'
-import {errorHandlingMiddleware} from './middlewares/errorhandlingmiddleware.js'
+import {errorHandlingMiddleware} from './middlewares/errorHandlingMiddleware.js'
 import cookieParser from "cookie-parser";
 
 const START_SERVER = ()=>{

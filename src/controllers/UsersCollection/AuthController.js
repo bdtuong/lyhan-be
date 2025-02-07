@@ -1,37 +1,37 @@
 import { StatusCodes } from 'http-status-codes'
 import { AuthService } from '../../services/AuthService.js'
 import { AuthModel } from '../../models/AuthModel.js'
-import  ApiError  from '../../utils/ApiError.js'
+import ApiError from '../../utils/ApiError.js'
 import { env } from '../../config/environment.js'
 import bcrypt from 'bcrypt'
-import  jwt  from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 import { ObjectId } from 'mongodb'
 import { myProfileService } from '../../services/myProfileService.js'
 import nodemailer from 'nodemailer'
 
 const createNew = async (req, res, next) => {
     try {
-        
-        //điều hướng đến tầng service
-        const createdUser = await AuthService.createNew(req.body)
-        
-        // Tạo profile tự động sau khi tạo user thành công (cách 2-tạo ở backend)
-        const profileData = {
-            username: req.body.username,
-            owner: createdUser._id.toString(), 
-        };
-        await myProfileService.createmyProfile(profileData);    
-        
-        // Tạo access token
-        const access_token = GenerateAccessToken(createdUser);
+
+    //điều hướng đến tầng service
+    const createdUser = await AuthService.createNew(req.body)
+
+    // Tạo profile tự động sau khi tạo user thành công (cách 2-tạo ở backend)
+    const profileData = {
+        username: req.body.username,
+        owner: createdUser._id.toString(),
+    };
+    await myProfileService.createmyProfile(profileData);
+
+    // Tạo access token
+    const access_token = GenerateAccessToken(createdUser);
 
 
-        //có kết quả thì trả về Client
-        res.status(StatusCodes.CREATED).json({access_token})
+    //có kết quả thì trả về Client
+    res.status(StatusCodes.CREATED).json({ access_token })
 
 
     } catch (error) {
-        next(error)
+    next(error)
     }
 }
 
@@ -42,11 +42,11 @@ const createNew = async (req, res, next) => {
 
 const GenerateAccessToken = (User) => {
     return jwt.sign({
-        id: User._id,
-        admin: User.admin,
+    id: User._id,
+    admin: User.admin,
     },
     env.JWT_ACCESS_TOKEN_SECRET,
-    {expiresIn: '15m'}
+    { expiresIn: '1d' }
     )
 }
 
@@ -62,45 +62,45 @@ const GenerateAccessToken = (User) => {
 
 const LoginUser = async (req, res, next) => {
     try {
-        const { email, password: inputPassword } = req.body;
+    const { email, password: inputPassword } = req.body;
 
-        // Find the user by userID
-        const User = await AuthModel.findOne({ email });
-        if (!User) {
-            throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
-        }
+    // Find the user by userID
+    const User = await AuthModel.findOne({ email });
+    if (!User) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+    }
 
-        // Verify the password
-        const ValidPassword = await bcrypt.compare(inputPassword, User.password);
-        if (!ValidPassword) {
-            throw new ApiError(StatusCodes.UNAUTHORIZED, 'Wrong Password');
-        }
+    // Verify the password
+    const ValidPassword = await bcrypt.compare(inputPassword, User.password);
+    if (!ValidPassword) {
+        throw new ApiError(StatusCodes.UNAUTHORIZED, 'Wrong Password');
+    }
 
-        if(User && ValidPassword){
+    if (User && ValidPassword) {
         const access_token = GenerateAccessToken(User);
-        //const refreshtoken = GenerateRefreshToken(User);
+      //const refreshtoken = GenerateRefreshToken(User);
 
-        // Store the refresh token
-        // refresh_tokens.push(refreshtoken);
-        // Set the refresh token as a cookie
-        // res.cookie('refreshtoken', refreshtoken, {
-        //     httpOnly: true,
-        //     path: '/refreshtoken',
-        //     secure: false, // Set to true in production
-        //     sameSite: 'strict', // Prevent CSRF
-        // });
-        
+      // Store the refresh token
+      // refresh_tokens.push(refreshtoken);
+      // Set the refresh token as a cookie
+      // res.cookie('refreshtoken', refreshtoken, {
+      //     httpOnly: true,
+      //     path: '/refreshtoken',
+      //     secure: false, // Set to true in production
+      //     sameSite: 'strict', // Prevent CSRF
+      // });
 
-        // Prepare the response without exposing the user's password
-        // const userData = User._doc || User; // Handle cases where _doc might be missing
-        // const { password,userID,slug,admin,createdAt,updatedAt, _destroy, ...UsertoUI } = userData;
+
+      // Prepare the response without exposing the user's password
+      // const userData = User._doc || User; // Handle cases where _doc might be missing
+      // const { password,userID,slug,admin,createdAt,updatedAt, _destroy, ...UsertoUI } = userData;
         res.status(StatusCodes.OK).json({
-            // ...UsertoUI,
-            access_token,
+        // ...UsertoUI,
+        access_token,
         });
     }
     } catch (error) {
-        next(error);
+    next(error);
     }
 };
 
@@ -153,26 +153,26 @@ const LoginUser = async (req, res, next) => {
 
 const getDetails = async (req, res, next) => {
     try {
-        const Userid = req.params.id
+    const Userid = req.params.id
 
-        const User = await AuthService.getDetails(Userid)
-    
-        res.status(StatusCodes.OK).json(User)
+    const User = await AuthService.getDetails(Userid)
+
+    res.status(StatusCodes.OK).json(User)
     } catch (error) {
-        next(error)
+    next(error)
     }
 }
 
 const Logout = async (req, res) => {
-    // res.clearCookie('refreshtoken', {
-    //     httpOnly: true,
-    //     secure: process.env.NODE_ENV === 'production',
-    //     sameSite: "strict",
-    //     path: "/",
-    // })
-    // //lọc ra refresh token tồn tại
-    // refresh_tokens = refresh_tokens.filter(token => token !== req.cookies.refreshtoken)
-    res.status(StatusCodes.OK).json({message: 'Logout success'})
+  // res.clearCookie('refreshtoken', {
+  //     httpOnly: true,
+  //     secure: process.env.NODE_ENV === 'production',
+  //     sameSite: "strict",
+  //     path: "/",
+  // })
+  // //lọc ra refresh token tồn tại
+  // refresh_tokens = refresh_tokens.filter(token => token !== req.cookies.refreshtoken)
+  res.status(StatusCodes.OK).json({ message: 'Logout success' })
 }
 
 //Lưu trữ Token
@@ -187,25 +187,25 @@ const Logout = async (req, res) => {
 
 
 const changePassword = async (req, res, next) => {
-    try {
-        const { oldPassword, newPassword, confirmNewPassword } = req.body;
-        const userId = req.params.userId; // Lấy từ URL params
-        
-        // Kiểm tra userId có tồn tại và đúng định dạng không
-        if (!userId || !ObjectId.isValid(userId)) {
-            throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid userId");
-        }
+  try {
+    const { oldPassword, newPassword, confirmNewPassword } = req.body;
+    const userId = req.params.userId; // Lấy từ URL params
 
-        // Chuyển đổi userId thành ObjectId
-        const objectId = new ObjectId(userId);
-
-        // Gọi service để xử lý logic
-        const result = await AuthService.changePassword(objectId, oldPassword, newPassword, confirmNewPassword);
-
-        res.status(StatusCodes.OK).json(result);
-    } catch (error) {
-        next(error);
+    // Kiểm tra userId có tồn tại và đúng định dạng không
+    if (!userId || !ObjectId.isValid(userId)) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid userId");
     }
+
+    // Chuyển đổi userId thành ObjectId
+    const objectId = new ObjectId(userId);
+
+    // Gọi service để xử lý logic
+    const result = await AuthService.changePassword(objectId, oldPassword, newPassword, confirmNewPassword);
+
+    res.status(StatusCodes.OK).json(result);
+  } catch (error) {
+    next(error);
+  }
 };
 
 const forgotPassword = async (req, res, next) => {
@@ -234,27 +234,27 @@ const forgotPassword = async (req, res, next) => {
                 <a href="${process.env.FRONTEND_URL}/reset-password/${resetToken}?email=${email}">${process.env.FRONTEND_URL}/reset-password/${resetToken}?email=${email}</a>
                 <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
             `
-        };
+    };
 
-        // Gửi email
-        await transporter.sendMail(mailOptions);
+    // Gửi email
+    await transporter.sendMail(mailOptions);
 
-        res.status(StatusCodes.OK).json({ message: 'Password reset email sent' });
+    res.status(StatusCodes.OK).json({ message: 'Password reset email sent' });
     } catch (error) {
-        next(error);
+    next(error);
     }
 };
 
 const resetPassword = async (req, res, next) => {
     try {
-        const token = req.params;
-        const { email, password, confirmPassword } = req.body;
+    const { token } = req.params;
+    const { password, confirmPassword } = req.body;
 
-        await AuthService.resetPassword(token, email, password, confirmPassword);
+    await AuthService.resetPassword(token, password, confirmPassword);
 
-        res.status(StatusCodes.OK).json({ message: 'Password reset successfully' });
+    res.status(StatusCodes.OK).json({ message: 'Password reset successfully' });
     } catch (error) {
-        next(error);
+    next(error);
     }
 };
 
@@ -262,7 +262,7 @@ export const AuthController = {
     createNew,
     getDetails,
     LoginUser,
-    //requestRefreshToken,
+  //requestRefreshToken,
     Logout,
     changePassword,
     forgotPassword,
