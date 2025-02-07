@@ -29,6 +29,6 @@ Router1.route('/forgot-password')
     .post(AuthController.forgotPassword)
 
 Router1.route('/reset-password/:token')
-    .post(AuthController.resetPassword); // Thêm route mới  
+    .put(AuthController.resetPassword);
 
 export const AuthRoute = Router1

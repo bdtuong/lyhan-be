@@ -57,7 +57,9 @@ const createNew = async (data) => {
 
 const findOne = async (query) => {
     try {
-        return await GET_DB().collection(USER_COLLECTION_NAME).findOne(query)
+        const user = await GET_DB().collection(USER_COLLECTION_NAME).findOne(query)
+
+        return user
     } catch (error) {
         throw new Error(error)
     }
@@ -141,7 +143,22 @@ const updateSharedPosts = async (userId, boardId) => {
     }
 };
 
-
+const resetPassword = async (email, hashedPassword) => {
+    try {
+        await GET_DB().collection(AuthModel.USER_COLLECTION_NAME).updateOne(
+            { email: email },
+            {
+                $set: {
+                    password: hashedPassword,
+                    resetPasswordToken: null,
+                    resetPasswordExpires: null
+                }
+            }
+        );
+    } catch (error) {
+        throw new Error(error)
+    }
+}
 
 
 export const AuthModel = {
@@ -153,5 +170,6 @@ export const AuthModel = {
     validateBeforeCreate,
     findOne,
     updatePassword,
-    updateSharedPosts
+    updateSharedPosts,
+    resetPassword
 }

@@ -210,27 +210,28 @@ const changePassword = async (req, res, next) => {
 
 const forgotPassword = async (req, res, next) => {
     try {
-        const { email } = req.body;
-        const resetToken = await AuthService.generateResetPasswordToken(email); 
+        const Email = req.body;
+        const email = Email.Email;
+        const resetToken = await AuthService.generateResetPasswordToken(email);
 
         // Tạo transporter
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: 'chuaco@gmail.com',
-                pass: 'null'
+                user: process.env.EMAIL_URL,
+                pass: process.env.EMAIL_PASS,
             }
         });
 
         // Tạo nội dung email
         const mailOptions = {
-            from: 'chuaco@gmail.com', 
+            from: process.env.EMAIL_URL, 
             to: email,
             subject: 'Password Reset Request',
             html: `
                 <p>You are receiving this email because you (or someone else) has requested the reset of the password for your account.</p>
                 <p>Please click on the following link, or paste this into your browser to complete the process:</p>
-                <a href="${process.env.FRONTEND_URL}/reset-password/${resetToken}">${process.env.FRONTEND_URL}/reset-password/${resetToken}</a>
+                <a href="${process.env.FRONTEND_URL}/reset-password/${resetToken}?email=${email}">${process.env.FRONTEND_URL}/reset-password/${resetToken}?email=${email}</a>
                 <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
             `
         };
@@ -246,10 +247,10 @@ const forgotPassword = async (req, res, next) => {
 
 const resetPassword = async (req, res, next) => {
     try {
-        const { token } = req.params;
-        const { password, confirmPassword } = req.body;
+        const token = req.params;
+        const { email, password, confirmPassword } = req.body;
 
-        await AuthService.resetPassword(token, password, confirmPassword);
+        await AuthService.resetPassword(token, email, password, confirmPassword);
 
         res.status(StatusCodes.OK).json({ message: 'Password reset successfully' });
     } catch (error) {

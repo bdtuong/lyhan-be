@@ -96,7 +96,7 @@ const changePassword = async (userId, oldPassword, newPassword) => {
         // 5. Cập nhật mật khẩu mới vào database (gọi AuthModel)
         await AuthModel.updatePassword(userId, hashedPassword);
 
-        return { message: 'Password updated successfully' };
+        return { message: 'Password updated successfully! Please log in again after 3 seconds.' };
     } catch (error) {
         throw error;
     }
@@ -109,15 +109,15 @@ const generateResetPasswordToken = async (email) => {
             throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
         }
 
-        const resetToken = crypto.randomBytes(32).toString('hex'); // Tạo token ngẫu nhiên
+        const resetToken = crypto.randomBytes(32).toString('hex'); 
 
         // Cập nhật document trong MongoDB
         await GET_DB().collection(AuthModel.USER_COLLECTION_NAME).updateOne(
-            { _id: new ObjectId(user._id) }, // Điều kiện lọc
+            { email: email },
             {
                 $set: {
                     resetPasswordToken: resetToken,
-                    resetPasswordExpires: Date.now() + 3600000 // Token hết hạn sau 1 giờ
+                    resetPasswordExpires: Date.now() + 3600000
                 }
             }
         );
@@ -128,11 +128,10 @@ const generateResetPasswordToken = async (email) => {
     }
 };
 
-const resetPassword = async (token, password, confirmPassword) => {
+const resetPassword = async (token, email, password, confirmPassword) => {
     try {
-        // Tìm user theo token và kiểm tra thời gian hết hạn
-        const user = await GET_DB().collection(AuthModel.USER_COLLECTION_NAME).findOne({
-            resetPasswordToken: token,
+        const user = await AuthModel.findOne({
+            resetPasswordToken: token.token,
             resetPasswordExpires: { $gt: Date.now() }
         });
 
@@ -148,17 +147,7 @@ const resetPassword = async (token, password, confirmPassword) => {
         // Hash mật khẩu mới
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Cập nhật mật khẩu và reset token trong MongoDB
-        await GET_DB().collection(AuthModel.USER_COLLECTION_NAME).updateOne(
-            { _id: new ObjectId(user._id) }, // Điều kiện lọc
-            {
-                $set: {
-                    password: hashedPassword,
-                    resetPasswordToken: null,
-                    resetPasswordExpires: null
-                }
-            }
-        );
+        await AuthModel.resetPassword(email, hashedPassword);
     } catch (error) {
         throw error;
     }
