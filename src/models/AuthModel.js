@@ -15,6 +15,8 @@ const USER_COLLECTION_SCHEMA = Joi.object({
     password: Joi.string().required().min(8).trim().strict(),
     confirmPassword: Joi.string().required().valid(Joi.ref('password')).strict(),
     sharedPosts: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([]),
+    //userCollectionID:Joi.string(),
+    savedPosts: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([]),
     admin: Joi.boolean().default(false),
     slug: Joi.string().required().trim().strict(),
     
@@ -159,6 +161,27 @@ const resetPassword = async (email, hashedPassword) => {
         throw new Error(error)
     }
 }
+const updateSavedPosts = async (userId, boardId) => {
+    try {
+        const result = await GET_DB()
+            .collection(USER_COLLECTION_NAME)
+            .updateOne(
+                { _id: new ObjectId(userId) },
+                {
+                    $addToSet: { savedPosts: new ObjectId(boardId) },
+                    $set: { updatedAt: new Date().getTime() }
+                }
+            );
+
+        if (!result.acknowledged) {
+            throw new Error('Update saved posts failed');
+        }
+
+        return result;
+    } catch (error) {
+        throw error;
+    }
+};
 
 
 export const AuthModel = {
@@ -171,5 +194,6 @@ export const AuthModel = {
     findOne,
     updatePassword,
     updateSharedPosts,
-    resetPassword
+    resetPassword,
+    updateSavedPosts,
 }
