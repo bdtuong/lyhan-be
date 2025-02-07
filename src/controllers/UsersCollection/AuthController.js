@@ -172,7 +172,7 @@ const Logout = async (req, res) => {
   // })
   // //lọc ra refresh token tồn tại
   // refresh_tokens = refresh_tokens.filter(token => token !== req.cookies.refreshtoken)
-  res.status(StatusCodes.OK).json({ message: 'Logout success' })
+    res.status(StatusCodes.OK).json({ message: 'Logout success' })
 }
 
 //Lưu trữ Token
@@ -187,13 +187,13 @@ const Logout = async (req, res) => {
 
 
 const changePassword = async (req, res, next) => {
-  try {
+    try {
     const { oldPassword, newPassword, confirmNewPassword } = req.body;
     const userId = req.params.userId; // Lấy từ URL params
 
     // Kiểm tra userId có tồn tại và đúng định dạng không
     if (!userId || !ObjectId.isValid(userId)) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid userId");
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid userId");
     }
 
     // Chuyển đổi userId thành ObjectId
@@ -203,9 +203,9 @@ const changePassword = async (req, res, next) => {
     const result = await AuthService.changePassword(objectId, oldPassword, newPassword, confirmNewPassword);
 
     res.status(StatusCodes.OK).json(result);
-  } catch (error) {
+    } catch (error) {
     next(error);
-  }
+    }
 };
 
 const forgotPassword = async (req, res, next) => {
