@@ -31,4 +31,7 @@ Router1.route('/forgot-password')
 Router1.route('/reset-password/:token')
     .put(AuthController.resetPassword);
 
+Router1.route('/change-username/:userId')
+    .put(AuthController.changeUsername);
+
 export const AuthRoute = Router1

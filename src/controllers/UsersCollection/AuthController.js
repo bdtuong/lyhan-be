@@ -258,6 +258,27 @@ const resetPassword = async (req, res, next) => {
     }
 };
 
+const changeUsername = async (req, res, next) => {
+    try {
+        const  {username}  = req.body;
+        const userId = req.params.userId;
+
+        if (!userId || !ObjectId.isValid(userId)) {
+            throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid userId");
+        }
+
+        // Chuyển đổi userId tính ObjectId
+        const objectId = new ObjectId(userId);
+
+        // Gọi service để xử lý logic
+        const result = await AuthService.changeUsername(objectId, username); 
+
+        res.status(StatusCodes.OK).json(result);
+    } catch (error) {
+        next(error);
+    }
+}
+
 export const AuthController = {
     createNew,
     getDetails,
@@ -266,5 +287,6 @@ export const AuthController = {
     Logout,
     changePassword,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    changeUsername
 }

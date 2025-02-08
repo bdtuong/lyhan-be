@@ -183,6 +183,17 @@ const updateSavedPosts = async (userId, boardId) => {
     }
 };
 
+const changeUsername = async (userId, username) => {
+    try {
+        await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
+            { _id: new ObjectId(userId) },
+            { $set: { username: username } }
+        );
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 
 export const AuthModel = {
     USER_COLLECTION_NAME,
@@ -196,4 +207,5 @@ export const AuthModel = {
     updateSharedPosts,
     resetPassword,
     updateSavedPosts,
+    changeUsername
 }

@@ -153,6 +153,28 @@ const resetPassword = async (token, email, password, confirmPassword) => {
     }
 };
 
+const changeUsername = async (userId, username) => {
+    try {
+        // 1. Kiểm tra userId hợp lệ
+        if (!userId) {
+            throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid userId');
+        }
+
+        // 2. Tìm user trong database
+        const user = await AuthModel.findOneById(userId);
+        if (!user) {
+            throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+        }
+
+        // 3. Cập nhật username trong database (gọi AuthModel)
+        await AuthModel.changeUsername(userId, username);
+
+        return { message: 'Username updated successfully!' };
+    } catch (error) {
+        throw error;
+    }
+};
+
 
 export const AuthService  ={
     createNew,
@@ -160,5 +182,6 @@ export const AuthService  ={
     changePassword,
     validateEmailDomain,
     generateResetPasswordToken,
-    resetPassword
+    resetPassword,
+    changeUsername
 }
