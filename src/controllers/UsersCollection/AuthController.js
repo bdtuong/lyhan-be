@@ -321,6 +321,17 @@ const updateAvatar = async (req, res, next) => {
     }
 };
 
+const getAvatar = async (req, res, next) => {
+    try {
+        const {content, contentType} = await AuthModel.getAvatar(req.params.userId);
+        res.setHeader('Content-Type', contentType);
+        res.send(content);
+    
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const AuthController = {
     createNew,
     getDetails,
@@ -332,5 +343,6 @@ export const AuthController = {
     resetPassword,
     changeUsername,
     updateAvatar,
-    handleAvatarUpload
+    handleAvatarUpload,
+    getAvatar
 }

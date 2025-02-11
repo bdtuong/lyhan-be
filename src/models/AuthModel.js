@@ -4,6 +4,8 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 import { GET_DB } from '../config/mongodb.js'
 import bcrypt from 'bcrypt'
 import { boardModel } from './boardModel.js'
+import fs from 'fs'
+import path from 'path'
 
 
 
@@ -207,6 +209,21 @@ const updateAvatar = async (userId, avatarUrl) => {
     }
 };
 
+const getAvatar = async (userId) => {
+    try {
+        const user = await GET_DB().collection(USER_COLLECTION_NAME).findOne({ _id: new ObjectId(userId) });
+        const avatarPath = user.avatar;
+        const content = fs.readFileSync(avatarPath);
+        const extname = path.extname(avatarPath).toLowerCase(); 
+        const contentType = `image/${extname.slice(1)}`;
+
+        return { content, contentType };    
+
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
 
 
 
@@ -223,5 +240,6 @@ export const AuthModel = {
     resetPassword,
     updateSavedPosts,
     changeUsername,
-    updateAvatar
+    updateAvatar,
+    getAvatar
 }

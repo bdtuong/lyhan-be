@@ -36,5 +36,7 @@ Router1.route('/change-username/:userId')
 Router1.route('/avatar/:userId')
     .put(AuthController.handleAvatarUpload,AuthController.updateAvatar);
 
+Router1.route('/get-avatar/:userId')
+    .get(AuthController.getAvatar);
 
 export const AuthRoute = Router1
