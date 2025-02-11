@@ -18,6 +18,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
     //userCollectionID:Joi.string(),
     savedPosts: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([]),
     admin: Joi.boolean().default(false),
+    avatar: Joi.array().items(Joi.string()).default(null),
     slug: Joi.string().required().trim().strict(),
     
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
@@ -194,6 +195,20 @@ const changeUsername = async (userId, username) => {
     }
 }
 
+const updateAvatar = async (userId, avatarUrl) => { 
+    try {
+
+        await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
+            { _id: new ObjectId(userId) },
+            { $set: { avatar: avatarUrl } }
+        );
+    } catch (error) {
+            throw new Error(error); 
+    }
+};
+
+
+
 
 export const AuthModel = {
     USER_COLLECTION_NAME,
@@ -207,5 +222,6 @@ export const AuthModel = {
     updateSharedPosts,
     resetPassword,
     updateSavedPosts,
-    changeUsername
+    changeUsername,
+    updateAvatar
 }

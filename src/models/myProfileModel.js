@@ -15,7 +15,7 @@ const MYPROFILE_COLLECTION_SCHEMA = Joi.object({
     location: Joi.string().max(40).allow(''),
     personality: Joi.array().items(Joi.string().max(50)).default([]),
     Introduction: Joi.string().max(100).allow(''),
-
+    avatar: Joi.array().items(Joi.string()).default(null),
 
     // bắt buộc 
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
@@ -101,6 +101,23 @@ const findOne = async (filter) => {
     }
 };
 
+const updateAvatar = async (userId, avatarUrl) => {
+    try {
+        console.log("Updating avatar for userId:", userId); // Log userId
+        console.log("Avatar URL:", avatarUrl); // Log avatarUrl
+
+        const result = await GET_DB().collection(MYPROFILE_COLLECTION_NAME).updateOne(
+            { owner: new ObjectId(userId) },
+            { $set: { avatar: avatarUrl } }
+        );
+
+        console.log("Update result:", result); // Log the result object
+    } catch (error) {
+        console.error("Error updating avatar:", error); // Log any errors
+        throw new Error(error);
+    }
+};
+
 
 
 export const myProfileModel = {
@@ -112,5 +129,6 @@ export const myProfileModel = {
     getAllProfiles,
     updateOne,
     findOne,
-    validateBeforeCreate
+    validateBeforeCreate,
+    updateAvatar
 }

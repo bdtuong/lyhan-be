@@ -7,7 +7,10 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { ObjectId } from 'mongodb'
 import { myProfileService } from '../../services/myProfileService.js'
+import { myProfileModel } from '../../models/myProfileModel.js'
 import nodemailer from 'nodemailer'
+import multer from 'multer'
+import path from 'path'
 
 const createNew = async (req, res, next) => {
     try {
@@ -279,6 +282,45 @@ const changeUsername = async (req, res, next) => {
     }
 }
 
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './src/avatars'); // Thư mục lưu trữ ảnh
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const upload = multer({storage: storage})
+
+const handleAvatarUpload = (req, res, next) => {
+    upload.single('avatar')(req, res, (err) => {
+        if (err) {
+        return next(err);
+        }
+        next(); // Chuyển đến hàm updateAvatar
+    });
+};
+
+const updateAvatar = async (req, res, next) => {
+    try {
+        console.log(req.file); // Kiểm tra giá trị của req.file
+
+        if (!req.file) { // Kiểm tra xem file có tồn tại không
+        return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        const {userId} = req.params;
+        const avatarUrl = req.file.path;
+        await AuthModel.updateAvatar(userId, avatarUrl);
+        await myProfileModel.updateAvatar(userId, avatarUrl);
+
+        res.status(StatusCodes.OK).json({ message: 'Avatar updated successfully' }); 
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const AuthController = {
     createNew,
     getDetails,
@@ -288,5 +330,7 @@ export const AuthController = {
     changePassword,
     forgotPassword,
     resetPassword,
-    changeUsername
+    changeUsername,
+    updateAvatar,
+    handleAvatarUpload
 }

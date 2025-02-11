@@ -2,7 +2,6 @@ import express from 'express'
 import { AuthValidation } from '../../validations/AuthValidation.js'
 import { AuthController } from '../../controllers/UsersCollection/AuthController.js'
 import { middlewareToken } from '../../middlewares/middlewareToken.js'
-
 const Router1 = express.Router()
 
 Router1.route('/')
@@ -33,5 +32,9 @@ Router1.route('/reset-password/:token')
 
 Router1.route('/change-username/:userId')
     .put(AuthController.changeUsername);
+
+Router1.route('/avatar/:userId')
+    .put(AuthController.handleAvatarUpload,AuthController.updateAvatar);
+
 
 export const AuthRoute = Router1
