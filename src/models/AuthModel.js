@@ -20,7 +20,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
     //userCollectionID:Joi.string(),
     savedPosts: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([]),
     admin: Joi.boolean().default(false),
-    avatar: Joi.array().items(Joi.string()).default(null),
+    avatar: Joi.array().items(Joi.string()).default('src/avatars/avatar-origin.jpg'),
     slug: Joi.string().required().trim().strict(),
     
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
