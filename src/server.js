@@ -18,7 +18,7 @@ const START_SERVER = ()=>{
   app.use(cookieParser());
 
 
-  app.use(cors())
+  app.use(cors(corsOptions))
   //enable red.body json data
   app.use(express.json())
   //enable req.body json data
