@@ -14,7 +14,7 @@ const MYPROFILE_COLLECTION_SCHEMA = Joi.object({
     occupation: Joi.string().max(15).allow(''),
     location: Joi.string().max(15).allow(''),
     personality: Joi.array().items(Joi.string().max(50)).default([]),
-    Introduction: Joi.string().max(50).allow(''),
+    Introduction: Joi.string().max(75).allow(''),
     avatar: Joi.array().items(Joi.string()).default('src/avatars/avatar-origin.jpg'),
 
     // bắt buộc 

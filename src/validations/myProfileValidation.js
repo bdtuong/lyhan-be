@@ -12,7 +12,7 @@ const createmyProfile = async (req , res , next )=> {
         occupation: Joi.string().max(15).allow('').message('Occupation must be a string with a maximum length of 15 characters'),
         location: Joi.string().max(15).allow('').message('Location must be a string with a maximum length of 15 characters'),
         personality: Joi.array().items(Joi.string().max(50)).default([]),
-        Introduction: Joi.string().max(50).allow('').message('Introduction must be a string with a maximum length of 50 characters'),
+        Introduction: Joi.string().max(75).allow('').message('Introduction must be a string with a maximum length of 75 characters'),
         updatedAt: Joi.date().timestamp('javascript').allow(null),
     });
 
