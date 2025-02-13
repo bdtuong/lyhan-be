@@ -7,7 +7,7 @@ export const env = {
 
     APP_HOST: process.env.APP_HOST,
     APP_PORT: process.env.APP_PORT,
-
+    FRONTEND_URL: process.env.FRONTEND_URL,
     JWT_ACCESS_TOKEN_SECRET: process.env.JWT_ACCESS_TOKEN_SECRET,
     //JWT_REFRESH_TOKEN_SECRET: process.env.JWT_REFRESH_TOKEN_SECRET,
 
