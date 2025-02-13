@@ -1,16 +1,18 @@
-import express from 'express'
-import { myProfileValidation } from '../../validations/myProfileValidation.js'
-import { myProfileController } from '../../controllers/UsersCollection/myProfileController.js'
+import express from 'express';
+import { myProfileValidation } from '../../validations/myProfileValidation.js';
+import { myProfileController } from '../../controllers/UsersCollection/myProfileController.js';
 
-const Router4 = express.Router()
+const Router4 = express.Router();
 
 Router4.route('/')
-    .post(myProfileValidation.createmyProfile, myProfileController.createmyProfile)
-    .get(myProfileController.getAllProfiles)
+  .post(
+    myProfileValidation.createmyProfile,
+    myProfileController.createmyProfile,
+  )
+  .get(myProfileController.getAllProfiles);
 
 Router4.route('/:owner')
-    .put(myProfileValidation.createmyProfile, myProfileController.updateProfile)
-    .get(myProfileController.getDetails)
+  .put(myProfileValidation.createmyProfile, myProfileController.updateProfile)
+  .get(myProfileController.getDetails);
 
-
-export const myProfileRoute = Router4
+export const myProfileRoute = Router4;

@@ -1,245 +1,259 @@
-import Joi from 'joi'
-import {ObjectId} from'mongodb'
-import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
-import { GET_DB } from '../config/mongodb.js'
-import bcrypt from 'bcrypt'
-import { boardModel } from './boardModel.js'
-import fs from 'fs'
-import path from 'path'
-
-
+import Joi from 'joi';
+import { ObjectId } from 'mongodb';
+import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js';
+import { GET_DB } from '../config/mongodb.js';
+import bcrypt from 'bcrypt';
+import { boardModel } from './boardModel.js';
+import fs from 'fs';
+import path from 'path';
 
 // Define Collection (name & schema)
-const USER_COLLECTION_NAME = 'Users'
+const USER_COLLECTION_NAME = 'Users';
 const USER_COLLECTION_SCHEMA = Joi.object({
-    username: Joi.string().required().min(6).max(15).trim().strict(),
-    email: Joi.string().required().email().trim().strict(),
-    password: Joi.string().required().min(8).trim().strict(),
-    confirmPassword: Joi.string().required().valid(Joi.ref('password')).strict(),
-    sharedPosts: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([]),
-    //userCollectionID:Joi.string(),
-    savedPosts: Joi.array().items(Joi.string().pattern(OBJECT_ID_RULE)).default([]),
-    admin: Joi.boolean().default(false),
-    avatar: Joi.array().items(Joi.string()).default('src/avatars/avatar-origin.jpg'),
-    slug: Joi.string().required().trim().strict(),
-    
-    createdAt: Joi.date().timestamp('javascript').default(Date.now),
-    updatedAt: Joi.date().timestamp('javascript').default(null),
+  username: Joi.string().required().min(6).max(15).trim().strict(),
+  email: Joi.string().required().email().trim().strict(),
+  password: Joi.string().required().min(8).trim().strict(),
+  confirmPassword: Joi.string().required().valid(Joi.ref('password')).strict(),
+  sharedPosts: Joi.array()
+    .items(Joi.string().pattern(OBJECT_ID_RULE))
+    .default([]),
+  //userCollectionID:Joi.string(),
+  savedPosts: Joi.array()
+    .items(Joi.string().pattern(OBJECT_ID_RULE))
+    .default([]),
+  admin: Joi.boolean().default(false),
+  avatar: Joi.array()
+    .items(Joi.string())
+    .default('src/avatars/avatar-origin.jpg'),
+  slug: Joi.string().required().trim().strict(),
 
-    resetPasswordToken: Joi.string().default(null),
-    resetPasswordExpires: Joi.date().timestamp('javascript').default(null),
-    
-    _destroy: Joi.boolean().default(false)
-})
+  createdAt: Joi.date().timestamp('javascript').default(Date.now),
+  updatedAt: Joi.date().timestamp('javascript').default(null),
 
-const validateBeforeCreate = async (data) => {
-    return await USER_COLLECTION_SCHEMA.validateAsync(data, {abortEarly: false})
+  resetPasswordToken: Joi.string().default(null),
+  resetPasswordExpires: Joi.date().timestamp('javascript').default(null),
 
+  _destroy: Joi.boolean().default(false),
+});
 
+const validateBeforeCreate = async data => {
+  return await USER_COLLECTION_SCHEMA.validateAsync(data, {
+    abortEarly: false,
+  });
 };
 
+const createNew = async data => {
+  try {
+    const validData = await validateBeforeCreate(data);
+    validData.password = await bcrypt.hash(validData.password, 10);
+    delete validData.confirmPassword;
 
-const createNew = async (data) => {
-    try {
-        const validData = await validateBeforeCreate(data)
-        validData.password = await bcrypt.hash(validData.password, 10)
-        delete validData.confirmPassword
-        
-        //chuyển _id thành ObjectId rồi gán vô userId để sài
-        const userId = new ObjectId();
-        validData._id = userId;
-        //validData.userCollectionID = userId;
+    //chuyển _id thành ObjectId rồi gán vô userId để sài
+    const userId = new ObjectId();
+    validData._id = userId;
+    //validData.userCollectionID = userId;
 
+    //console.log('validData: ', validData) //log ra validData(để debug)
+    const createdUser = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .insertOne(validData);
 
-        //console.log('validData: ', validData) //log ra validData(để debug)
-        const createdUser = await GET_DB().collection(USER_COLLECTION_NAME).insertOne(validData)
+    return createdUser;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 
-        return createdUser
-    } catch (error) {
-        throw new Error(error)
-    }
-}
+const findOne = async query => {
+  try {
+    const user = await GET_DB().collection(USER_COLLECTION_NAME).findOne(query);
 
-const findOne = async (query) => {
-    try {
-        const user = await GET_DB().collection(USER_COLLECTION_NAME).findOne(query)
+    return user;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 
-        return user
-    } catch (error) {
-        throw new Error(error)
-    }
-}
-
-const findOneById = async (id) => {
-    try {
-        return await GET_DB().collection(USER_COLLECTION_NAME).findOne({_id: new ObjectId(id)})
-    } catch (error) {
-        throw new Error(error)
-    }
-}
+const findOneById = async id => {
+  try {
+    return await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .findOne({ _id: new ObjectId(id) });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 // bat dau join data tai day
-const getDetails = async (id) => {
-    try {
-       // return await GET_DB().collection(USER_COLLECTION_NAME).findOne({_id: new ObjectId(id)})
-        const result = await GET_DB().collection(USER_COLLECTION_NAME).aggregate([
-            {$match: {
-                _id: new ObjectId(id),
-                _destroy: false
-            } },
-            {$lookup: {
-                from: boardModel.BOARD_COLLECTION_NAME,
-                localField: '_id',
-                foreignField: 'userID',
-                as: 'boards'
-            } }
+const getDetails = async id => {
+  try {
+    // return await GET_DB().collection(USER_COLLECTION_NAME).findOne({_id: new ObjectId(id)})
+    const result = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .aggregate([
+        {
+          $match: {
+            _id: new ObjectId(id),
+            _destroy: false,
+          },
+        },
+        {
+          $lookup: {
+            from: boardModel.BOARD_COLLECTION_NAME,
+            localField: '_id',
+            foreignField: 'userID',
+            as: 'boards',
+          },
+        },
+      ])
+      .toArray();
 
-        ]).toArray()
-
-        return result[0] || {}
-
-    } catch (error) {
-        throw new Error(error)
-    }
-}
+    return result[0] || {};
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 
 const updatePassword = async (userId, hashedPassword) => {
-    try {
-        const result = await GET_DB()
-            .collection(USER_COLLECTION_NAME)
-            .updateOne(
-                { _id: new ObjectId(userId) }, // Chuyển đổi userId thành ObjectId
-            {
-                $set: {
-                password: hashedPassword,
-                updatedAt: new Date().getTime(), // Cập nhật thời gian sửa đổi
-                },
-            }
-            );
+  try {
+    const result = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .updateOne(
+        { _id: new ObjectId(userId) }, // Chuyển đổi userId thành ObjectId
+        {
+          $set: {
+            password: hashedPassword,
+            updatedAt: new Date().getTime(), // Cập nhật thời gian sửa đổi
+          },
+        },
+      );
 
-        if (!result.acknowledged) {
-            throw new Error('Update password failed');
-        }
-
-        return result;
-    } catch (error) {
-        throw error;
+    if (!result.acknowledged) {
+      throw new Error('Update password failed');
     }
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
 };
 
 const updateSharedPosts = async (userId, boardId) => {
-    try {
-        const result = await GET_DB()
-            .collection(USER_COLLECTION_NAME)
-            .updateOne(
-                { _id: new ObjectId(userId) },
-                {
-                    $addToSet: { sharedPosts: new ObjectId(boardId) },
-                    $set: { updatedAt: new Date().getTime() }
-                }
-            );
+  try {
+    const result = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .updateOne(
+        { _id: new ObjectId(userId) },
+        {
+          $addToSet: { sharedPosts: new ObjectId(boardId) },
+          $set: { updatedAt: new Date().getTime() },
+        },
+      );
 
-        if (!result.acknowledged) {
-            throw new Error('Update shared posts failed');
-        }
-
-        return result;
-    } catch (error) {
-        throw error;
+    if (!result.acknowledged) {
+      throw new Error('Update shared posts failed');
     }
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
 };
 
 const resetPassword = async (email, hashedPassword) => {
-    try {
-        await GET_DB().collection(AuthModel.USER_COLLECTION_NAME).updateOne(
-            { email: email },
-            {
-                $set: {
-                    password: hashedPassword,
-                    resetPasswordToken: null,
-                    resetPasswordExpires: null
-                }
-            }
-        );
-    } catch (error) {
-        throw new Error(error)
-    }
-}
+  try {
+    await GET_DB()
+      .collection(AuthModel.USER_COLLECTION_NAME)
+      .updateOne(
+        { email: email },
+        {
+          $set: {
+            password: hashedPassword,
+            resetPasswordToken: null,
+            resetPasswordExpires: null,
+          },
+        },
+      );
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 const updateSavedPosts = async (userId, boardId) => {
-    try {
-        const result = await GET_DB()
-            .collection(USER_COLLECTION_NAME)
-            .updateOne(
-                { _id: new ObjectId(userId) },
-                {
-                    $addToSet: { savedPosts: new ObjectId(boardId) },
-                    $set: { updatedAt: new Date().getTime() }
-                }
-            );
+  try {
+    const result = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .updateOne(
+        { _id: new ObjectId(userId) },
+        {
+          $addToSet: { savedPosts: new ObjectId(boardId) },
+          $set: { updatedAt: new Date().getTime() },
+        },
+      );
 
-        if (!result.acknowledged) {
-            throw new Error('Update saved posts failed');
-        }
-
-        return result;
-    } catch (error) {
-        throw error;
+    if (!result.acknowledged) {
+      throw new Error('Update saved posts failed');
     }
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
 };
 
 const changeUsername = async (userId, username) => {
-    try {
-        await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
-            { _id: new ObjectId(userId) },
-            { $set: { username: username } }
-        );
-    } catch (error) {
-        throw new Error(error)
-    }
-}
-
-const updateAvatar = async (userId, avatarUrl) => { 
-    try {
-
-        await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
-            { _id: new ObjectId(userId) },
-            { $set: { avatar: avatarUrl } }
-        );
-    } catch (error) {
-            throw new Error(error); 
-    }
+  try {
+    await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .updateOne(
+        { _id: new ObjectId(userId) },
+        { $set: { username: username } },
+      );
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
-const getAvatar = async (userId) => {
-    try {
-        const user = await GET_DB().collection(USER_COLLECTION_NAME).findOne({ _id: new ObjectId(userId) });
-        const avatarPath = user.avatar;
-        const content = fs.readFileSync(avatarPath);
-        const extname = path.extname(avatarPath).toLowerCase(); 
-        const contentType = `image/${extname.slice(1)}`;
-
-        return { content, contentType };    
-
-    } catch (error) {
-        throw new Error(error);
-    }
+const updateAvatar = async (userId, avatarUrl) => {
+  try {
+    await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .updateOne(
+        { _id: new ObjectId(userId) },
+        { $set: { avatar: avatarUrl } },
+      );
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
+const getAvatar = async userId => {
+  try {
+    const user = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .findOne({ _id: new ObjectId(userId) });
+    const avatarPath = user.avatar;
+    const content = fs.readFileSync(avatarPath);
+    const extname = path.extname(avatarPath).toLowerCase();
+    const contentType = `image/${extname.slice(1)}`;
 
-
+    return { content, contentType };
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 
 export const AuthModel = {
-    USER_COLLECTION_NAME,
-    USER_COLLECTION_SCHEMA,
-    createNew,
-    findOneById,
-    getDetails,
-    validateBeforeCreate,
-    findOne,
-    updatePassword,
-    updateSharedPosts,
-    resetPassword,
-    updateSavedPosts,
-    changeUsername,
-    updateAvatar,
-    getAvatar
-}
+  USER_COLLECTION_NAME,
+  USER_COLLECTION_SCHEMA,
+  createNew,
+  findOneById,
+  getDetails,
+  validateBeforeCreate,
+  findOne,
+  updatePassword,
+  updateSharedPosts,
+  resetPassword,
+  updateSavedPosts,
+  changeUsername,
+  updateAvatar,
+  getAvatar,
+};
