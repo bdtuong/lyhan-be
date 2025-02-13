@@ -9,12 +9,12 @@ const MYPROFILE_COLLECTION_SCHEMA = Joi.object({
     owner: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     username: Joi.string().required(),
     slug: Joi.string().trim().strict(),
-    age: Joi.number().integer().min(0).max(1000).allow(null),
-    education: Joi.string().max(100).allow(''),
-    occupation: Joi.string().max(40).allow(''),
-    location: Joi.string().max(40).allow(''),
+    age: Joi.number().integer().min(0).max(200).allow(null),
+    education: Joi.string().max(15).allow(''),
+    occupation: Joi.string().max(15).allow(''),
+    location: Joi.string().max(15).allow(''),
     personality: Joi.array().items(Joi.string().max(50)).default([]),
-    Introduction: Joi.string().max(100).allow(''),
+    Introduction: Joi.string().max(50).allow(''),
     avatar: Joi.array().items(Joi.string()).default('src/avatars/avatar-origin.jpg'),
 
     // bắt buộc 
