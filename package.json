@@ -2,7 +2,7 @@
   "name": "scout-codesharing",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "type": "commonjs",
   "engines": {
     "node": "23.4.0"
   },
