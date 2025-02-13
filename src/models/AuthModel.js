@@ -12,7 +12,7 @@ import path from 'path'
 // Define Collection (name & schema)
 const USER_COLLECTION_NAME = 'Users'
 const USER_COLLECTION_SCHEMA = Joi.object({
-    username: Joi.string().required().min(6).max(20).trim().strict(),
+    username: Joi.string().required().min(6).max(15).trim().strict(),
     email: Joi.string().required().email().trim().strict(),
     password: Joi.string().required().min(8).trim().strict(),
     confirmPassword: Joi.string().required().valid(Joi.ref('password')).strict(),
