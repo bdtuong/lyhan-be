@@ -8,7 +8,7 @@ export const corsOptions = {
   origin: function (origin, callback) {
     console.log(origin)
     
-    if (!origin && env.BUILD_MODE === 'production') {
+    if (!origin && env.BUILD_MODE === 'dev') {
       return callback(null, true)
     }
 
@@ -20,7 +20,7 @@ export const corsOptions = {
     // Cuối cùng nếu domain không được chấp nhận thì trả về lỗi
     return callback(new ApiError(StatusCodes.FORBIDDEN, `${origin} not allowed by our CORS Policy.`))
   },
-
+ 
   // Some legacy browsers (IE11, various SmartTVs) choke on 204
   optionsSuccessStatus: 200,
 
