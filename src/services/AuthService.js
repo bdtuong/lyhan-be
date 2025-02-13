@@ -131,7 +131,7 @@ const generateResetPasswordToken = async (email) => {
 const resetPassword = async (token, email, password, confirmPassword) => {
     try {
         const user = await AuthModel.findOne({
-            resetPasswordToken: token.token,
+            resetPasswordToken: token,
             resetPasswordExpires: { $gt: Date.now() }
         });
 

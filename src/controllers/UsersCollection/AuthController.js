@@ -251,9 +251,9 @@ const forgotPassword = async (req, res, next) => {
 const resetPassword = async (req, res, next) => {
     try {
     const { token } = req.params;
-    const { password, confirmPassword } = req.body;
+    const { email, password, confirmPassword } = req.body;
 
-    await AuthService.resetPassword(token, password, confirmPassword);
+    await AuthService.resetPassword(token, email, password, confirmPassword);
 
     res.status(StatusCodes.OK).json({ message: 'Password reset successfully' });
     } catch (error) {
