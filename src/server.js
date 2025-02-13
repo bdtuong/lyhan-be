@@ -30,7 +30,7 @@ const START_SERVER = ()=>{
   app.use(errorHandlingMiddleware)
 
   app.listen(env.APP_PORT, env.APP_HOST, () => {
-    console.log(`3. Hello ${env.AUTHOR}, We are running at http://${env.APP_HOST}:${env.APP_PORT}/`);
+    console.log(`3. Hello ${env.AUTHOR}, We are running at ${env.FRONTEND_URL}`);
   });
   //Thực hiện cleanup trước khi dừng server
   exitHook((signal)=>{
