@@ -1,11 +1,11 @@
 import { StatusCodes } from 'http-status-codes';
-import { AuthModel } from '../models/AuthModel.js';
-import ApiError from '../utils/ApiError.js';
-import { slugify } from '../utils/formatters.js';
+import { AuthModel } from '~/models/AuthModel.js';
+import ApiError from '~/utils/ApiError.js';
+import { slugify } from '~/utils/formatters.js';
 import bcrypt from 'bcrypt';
 import dns from 'dns';
 import crypto from 'crypto-browserify';
-import { GET_DB } from '../config/mongodb.js';
+import { GET_DB } from '~/config/mongodb.js';
 import { ObjectId } from 'mongodb';
 
 const validateEmailDomain = email => {

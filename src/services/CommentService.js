@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
-import { CommentModel } from '../models/commentModel.js';
-import ApiError from '../utils/ApiError.js';
+import { CommentModel } from '~/models/commentModel.js';
+import ApiError from '~/utils/ApiError.js';
 import { ObjectId } from 'mongodb';
 
 const createComment = async reqBody => {

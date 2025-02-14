@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
-import { boardscollectionModel } from '../models/boardCollectionModel.js';
-import ApiError from '../utils/ApiError.js';
-import { slugify } from '../utils/formatters.js';
+import { boardscollectionModel } from '~/models/boardCollectionModel.js';
+import ApiError from '~/utils/ApiError.js';
+import { slugify } from '~/utils/formatters.js';
 
 const createNew = async reqBody => {
   try {

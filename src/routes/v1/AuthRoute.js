@@ -1,7 +1,7 @@
 import express from 'express';
-import { AuthValidation } from '../../validations/AuthValidation.js';
-import { AuthController } from '../../controllers/UsersCollection/AuthController.js';
-import { middlewareToken } from '../../middlewares/middlewareToken.js';
+import { AuthValidation } from '~/validations/AuthValidation.js';
+import { AuthController } from '~/controllers/UsersCollection/AuthController.js';
+import { middlewareToken } from '~/middlewares/middlewareToken.js';
 const Router1 = express.Router();
 
 Router1.route('/').post(AuthValidation.createNew, AuthController.createNew);

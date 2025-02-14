@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
-import { myProfileService } from '../../services/myProfileService.js';
-import ApiError from '../../utils/ApiError.js';
+import { myProfileService } from '~/services/myProfileService.js';
+import ApiError from '~/utils/ApiError.js';
 
 const createmyProfile = async (req, res, next) => {
   try {

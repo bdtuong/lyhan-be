@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
-import { CommentInlineService } from '../../services/commentInlineService.js';
+import { CommentInlineService } from '~/services/commentInlineService.js';
 
 const createComment = async (req, res, next) => {
   try {

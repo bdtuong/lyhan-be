@@ -1,7 +1,7 @@
 import Joi from 'joi';
 import { ObjectId } from 'mongodb';
-import { GET_DB } from '../config/mongodb.js';
-import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js';
+import { GET_DB } from '~/config/mongodb.js';
+import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators.js';
 // Define Collection (name & schema)
 
 const COMMENT_COLLECTION_NAME = 'comments';

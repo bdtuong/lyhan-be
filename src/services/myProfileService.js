@@ -1,8 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
-import ApiError from '../utils/ApiError.js';
+import ApiError from '~/utils/ApiError.js';
 import { ObjectId } from 'mongodb';
-import { myProfileModel } from '../models/myProfileModel.js';
-import { slugify } from '../utils/formatters.js';
+import { myProfileModel } from '~/models/myProfileModel.js';
+import { slugify } from '~/utils/formatters.js';
 
 const createmyProfile = async reqBody => {
   try {

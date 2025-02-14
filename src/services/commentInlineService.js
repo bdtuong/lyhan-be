@@ -1,8 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
-import { CommentInlineModel } from '../models/commentInlineModel.js';
-import ApiError from '../utils/ApiError.js';
+import { CommentInlineModel } from '~/models/commentInlineModel.js';
+import ApiError from '~/utils/ApiError.js';
 import { ObjectId } from 'mongodb';
-import { AuthModel } from '../models/AuthModel.js';
+import { AuthModel } from '~/models/AuthModel.js';
 
 const createComment = async reqBody => {
   try {

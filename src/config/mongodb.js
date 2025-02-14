@@ -4,7 +4,7 @@
 // Replace the placeholders in the connection string uri with your credentials
 
 // Create a client with options to specify Stable API Version 1
-import { env } from '../config/environment.js';
+import { env } from '~/config/environment.js';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 let scoutdatabaseInstance = null;
 

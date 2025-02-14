@@ -1,6 +1,6 @@
 import Joi from 'joi';
 import { ObjectId } from 'mongodb';
-import { GET_DB } from '../config/mongodb.js';
+import { GET_DB } from '~/config/mongodb.js';
 import { boardModel } from './boardModel.js';
 
 // Define Collection (name & schema)

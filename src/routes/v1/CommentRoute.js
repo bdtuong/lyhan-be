@@ -1,6 +1,6 @@
 import express from 'express';
-import { CommentValidation } from '../../validations/CommentValidation.js';
-import { CommentController } from '../../controllers/CommentsCollection/CommentController.js';
+import { CommentValidation } from '~/validations/CommentValidation.js';
+import { CommentController } from '~/controllers/CommentsCollection/CommentController.js';
 
 const Router3 = express.Router();
 

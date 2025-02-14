@@ -1,8 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
-import ApiError from '../../utils/ApiError.js';
-import { boardService } from '../../services/boardService.js';
-import { boardModel } from '../../models/boardModel.js';
-import { AuthModel } from '../../models/AuthModel.js';
+import ApiError from '~/utils/ApiError.js';
+import { boardService } from '~/services/boardService.js';
+import { boardModel } from '~/models/boardModel.js';
+import { AuthModel } from '~/models/AuthModel.js';
 
 const createNew = async (req, res, next) => {
   try {

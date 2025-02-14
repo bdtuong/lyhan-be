@@ -1,6 +1,6 @@
 import express from 'express';
-import { CommentInlineValidation } from '../../validations/commentInclineValidation.js';
-import { CommentInclineController } from '../../controllers/CommentsCollection/CommentInlineController.js';
+import { CommentInlineValidation } from '~/validations/commentInclineValidation.js';
+import { CommentInclineController } from '~/controllers/CommentsCollection/CommentInlineController.js';
 
 const Router5 = express.Router();
 

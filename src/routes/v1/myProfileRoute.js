@@ -1,6 +1,6 @@
 import express from 'express';
-import { myProfileValidation } from '../../validations/myProfileValidation.js';
-import { myProfileController } from '../../controllers/UsersCollection/myProfileController.js';
+import { myProfileValidation } from '~/validations/myProfileValidation.js';
+import { myProfileController } from '~/controllers/UsersCollection/myProfileController.js';
 
 const Router4 = express.Router();
 

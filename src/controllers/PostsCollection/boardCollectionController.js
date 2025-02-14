@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 
-import { boardCollectionService } from '../../services/boardCollectionService.js';
+import { boardCollectionService } from '~/services/boardCollectionService.js';
 
 const createNew = async (req, res, next) => {
   try {

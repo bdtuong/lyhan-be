@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
-import { CommentService } from '../../services/CommentService.js';
+import { CommentService } from '~/services/CommentService.js';
 
 const createComment = async (req, res, next) => {
   try {

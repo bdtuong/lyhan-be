@@ -1,7 +1,7 @@
 import express from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { userController } from '../../controllers/UsersCollection/UserController.js';
-import { middlewareToken } from '../../middlewares/middlewareToken.js';
+import { userController } from '~/controllers/UsersCollection/UserController.js';
+import { middlewareToken } from '~/middlewares/middlewareToken.js';
 
 const Router2 = express.Router();
 
