@@ -8,7 +8,7 @@ import { env } from './config/environment.js';
 import { APIs_V1 } from './routes/v1/index.js';
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware.js';
 import cookieParser from 'cookie-parser';
-import 'module-alias/register'
+import 'module-alias/register';
 
 const START_SERVER = () => {
   //xu ly cors

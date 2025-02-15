@@ -17,4 +17,6 @@ Router.route('/details').post(boardController.getSharedPostsDetails);
 
 Router.route('/saveDetails').post(boardController.getSavedPostsDetails);
 
+Router.route('/pagination/pagenumber').get(boardController.getBoards);
+
 export const boardRoute = Router;

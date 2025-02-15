@@ -106,6 +106,33 @@ const getSavedPostsDetails = async (req, res, next) => {
   }
 };
 
+const getBoards = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = 12;
+
+    const { boards, totalCount } = await boardService.getBoardsWithPagination(
+      page,
+      pageSize,
+    );
+
+    const totalPages = Math.ceil(totalCount / pageSize); // Tính tổng số trang
+
+    res.status(StatusCodes.OK).json({
+      boards,
+      currentPage: page,
+      totalPages,
+      totalCount,
+    });
+  } catch (error) {
+    // Xử lý lỗi
+    console.error(error);
+    res.status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR).json({
+      message: error.message || 'An error occurred',
+    });
+  }
+};
+
 export const boardController = {
   createNew,
   getDetails,
@@ -113,4 +140,5 @@ export const boardController = {
   getSharedPostsDetails,
   saveBoard,
   getSavedPostsDetails,
+  getBoards,
 };

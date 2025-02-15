@@ -140,6 +140,30 @@ const updateUserShare = async (boardId, userId) => {
   }
 };
 
+const getBoardsWithPagination = async (page, pageSize) => {
+  try {
+    const skip = (page - 1) * pageSize; // Tính số bản ghi cần bỏ qua
+    const boards = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .find({})
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(pageSize)
+      .toArray();
+
+    const totalCount = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .countDocuments(); // Lấy tổng số bản ghi
+
+    return {
+      boards,
+      totalCount,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
@@ -147,4 +171,5 @@ export const boardModel = {
   findOneById,
   getDetails,
   updateUserShare,
+  getBoardsWithPagination,
 };

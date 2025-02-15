@@ -87,8 +87,34 @@ const shareBoard = async (boardId, userCollectionID) => {
   }
 };
 
+const getBoardsWithPagination = async (page, pageSize) => {
+  try {
+    const { boards, totalCount } = await boardModel.getBoardsWithPagination(
+      page,
+      pageSize,
+    );
+
+    if (!boards) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Boards not found');
+    }
+
+    return {
+      boards,
+      totalCount,
+    };
+  } catch (error) {
+    console.error('Error getting boards with pagination:', error);
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'An error occurred while getting boards',
+    );
+  }
+};
+
 export const boardService = {
   createNew,
   getDetails,
   shareBoard,
+  getBoardsWithPagination,
 };

@@ -72,7 +72,6 @@
   "_moduleAliases": {
     "~": "src"
   },
-  
   "main": "server.js",
   "repository": {
     "type": "git",
