@@ -15,7 +15,7 @@ Router.route('/:boardId/save').post(boardController.saveBoard);
 
 Router.route('/details').post(boardController.getSharedPostsDetails);
 
-Router.route('/saveDetails').post(boardController.getSavedPostsDetails);
+Router.route('/saveDetails/:userId').get(boardController.getSavedPostsDetails);
 
 Router.route('/pagination/pagenumber').get(boardController.getBoards);
 

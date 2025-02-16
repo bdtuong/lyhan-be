@@ -241,6 +241,31 @@ const getAvatar = async userId => {
   }
 };
 
+const getSavedPostsWithPagination = async (userId, page, pageSize) => {
+  try {
+    const skip = (page - 1) * pageSize;
+    const user = await GET_DB()
+    .collection(USER_COLLECTION_NAME)
+    .findOne({ _id: new ObjectId(userId) });
+
+    // Kiểm tra xem user có tồn tại không
+    if (!user) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+    }
+
+    const savedPosts = user.savedPosts || []; // Lấy danh sách savedPosts từ user
+    const totalCount = savedPosts.length; // Tổng số savedPosts
+
+    // Trả về danh sách savedPosts đã phân trang và tổng số lượng
+    return {
+      savedPosts: savedPosts.slice(skip, skip + pageSize),
+      totalCount,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const AuthModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
@@ -256,4 +281,5 @@ export const AuthModel = {
   changeUsername,
   updateAvatar,
   getAvatar,
+  getSavedPostsWithPagination,
 };

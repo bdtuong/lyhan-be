@@ -96,11 +96,35 @@ const saveBoard = async (req, res, next) => {
 
 const getSavedPostsDetails = async (req, res, next) => {
   try {
-    const { boardIds } = req.body;
-    const posts = await Promise.all(
-      boardIds.map(boardId => boardService.getDetails(boardId)),
+    const userId = req.params.userId; // Lấy userId từ URL params
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = 12;
+
+    const { savedPosts, totalCount } = await AuthModel.getSavedPostsWithPagination(
+      userId,
+      page,
+      pageSize,
     );
-    res.status(StatusCodes.OK).json(posts);
+
+    const posts = await Promise.all(
+      savedPosts.map(async boardId => {
+        try {
+          return await boardService.getDetails(boardId.toString());
+        } catch (error) {
+          console.error(`Error fetching board details for ID ${boardId}:`, error);
+          return null; 
+        }
+      }),
+    );
+
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    res.status(StatusCodes.OK).json({
+      posts,
+      currentPage: page,
+      totalPages,
+      totalCount,
+    });
   } catch (error) {
     next(error);
   }

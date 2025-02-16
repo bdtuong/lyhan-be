@@ -246,6 +246,7 @@ const getAvatar = async (req, res, next) => {
   }
 };
 
+
 export const AuthController = {
   createNew,
   getDetails,
