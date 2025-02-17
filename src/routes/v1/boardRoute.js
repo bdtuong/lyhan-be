@@ -19,4 +19,5 @@ Router.route('/saveDetails/:userId').get(boardController.getSavedPostsDetails);
 
 Router.route('/pagination/pagenumber').get(boardController.getBoards);
 
+Router.route('/search/content').get(boardController.searchPosts);
 export const boardRoute = Router;
