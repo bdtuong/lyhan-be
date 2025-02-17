@@ -17,7 +17,7 @@ const createmyProfile = async (req, res, next) => {
       .allow(null)
       .message('Age must be a number between 0 and 200'),
     education: Joi.string()
-      .max(15)
+      .max(40)
       .allow('')
       .message(
         'Education must be a string with a maximum length of 15 characters',
@@ -29,7 +29,7 @@ const createmyProfile = async (req, res, next) => {
         'Occupation must be a string with a maximum length of 15 characters',
       ),
     location: Joi.string()
-      .max(15)
+      .max(40)
       .allow('')
       .message(
         'Location must be a string with a maximum length of 15 characters',
