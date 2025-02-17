@@ -164,6 +164,21 @@ const getBoardsWithPagination = async (page, pageSize) => {
   }
 };
 
+
+
+const searchPosts = async (searchTerm) => {
+  try{
+    const results = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)  
+      .find(
+      { title: { $regex: searchTerm, $options: 'i' } })
+      .toArray()
+    return results;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
@@ -172,4 +187,5 @@ export const boardModel = {
   getDetails,
   updateUserShare,
   getBoardsWithPagination,
+  searchPosts,
 };

@@ -3,7 +3,7 @@ import ApiError from '~/utils/ApiError.js';
 import { boardService } from '~/services/boardService.js';
 import { boardModel } from '~/models/boardModel.js';
 import { AuthModel } from '~/models/AuthModel.js';
-
+import Joi from 'joi'
 const createNew = async (req, res, next) => {
   try {
     const createdBoard = await boardService.createNew(req.body);
@@ -157,6 +157,29 @@ const getBoards = async (req, res) => {
   }
 };
 
+
+
+
+const searchPosts = async (req, res, next) => {
+  try {
+    const { q: searchTerm } = req.query; 
+    const { error } = Joi.object({
+      q: Joi.string().required().min(3).max(50), 
+    }).validate(req.query);
+
+    if (error) {
+      return next(new ApiError(StatusCodes.BAD_REQUEST, error.details[0].message));
+    }
+
+    const results = await boardService.searchPosts(searchTerm);
+    res.status(StatusCodes.OK).json(results);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+
 export const boardController = {
   createNew,
   getDetails,
@@ -165,4 +188,5 @@ export const boardController = {
   saveBoard,
   getSavedPostsDetails,
   getBoards,
+  searchPosts,
 };
