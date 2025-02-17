@@ -13,7 +13,7 @@ const MYPROFILE_COLLECTION_SCHEMA = Joi.object({
   username: Joi.string().required(),
   slug: Joi.string().trim().strict(),
   age: Joi.number().integer().min(0).max(200).allow(null),
-  education: Joi.string().max(15).allow(''),
+  workplace: Joi.string().max(40).allow(''),
   occupation: Joi.string().max(15).allow(''),
   location: Joi.string().max(15).allow(''),
   personality: Joi.array().items(Joi.string().max(50)).default([]),
@@ -117,8 +117,8 @@ const findOne = async filter => {
 
 const updateAvatar = async (userId, avatarUrl) => {
   try {
-    console.log('Updating avatar for userId:', userId); // Log userId
-    console.log('Avatar URL:', avatarUrl); // Log avatarUrl
+    // console.log('Updating avatar for userId:', userId); // Log userId
+    // console.log('Avatar URL:', avatarUrl); // Log avatarUrl
 
     const result = await GET_DB()
       .collection(MYPROFILE_COLLECTION_NAME)
