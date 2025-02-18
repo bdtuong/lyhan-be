@@ -164,7 +164,7 @@ const searchPosts = async (req, res, next) => {
   try {
     const { q: searchTerm } = req.query; 
     const { error } = Joi.object({
-      q: Joi.string().required().min(3).max(50), 
+      q: Joi.string().required().min(0).max(50), 
     }).validate(req.query);
 
     if (error) {
