@@ -78,7 +78,7 @@ const getSortedComments = async postId => {
 const vote = async (commentId, userId, voteType) => {
   try {
     // In ra commentId nhận được từ controller(sài để debug)
-    //console.log('commentId in service(string):', commentId);
+    //cnsole.log('commentId in service(string):', commentId);
 
     // Chuyển đổi commentId sang ObjectId
     const commentObjectId = new ObjectId(commentId);

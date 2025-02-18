@@ -37,7 +37,6 @@ const validateBeforeCreate = async data => {
 const createmyProfile = async data => {
   try {
     const validData = await validateBeforeCreate(data);
-    console.log('validData: ', validData);
 
     //chuyển owner sang dạng ObjectId
     validData.owner = new ObjectId(validData.owner);

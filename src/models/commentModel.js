@@ -49,7 +49,6 @@ const validateBeforeCreate = async data => {
 const createComment = async data => {
   try {
     const validData = await validateBeforeCreate(data);
-    console.log('validData: ', validData);
     const createdComment = await GET_DB()
       .collection(COMMENT_COLLECTION_NAME)
       .insertOne(validData);
