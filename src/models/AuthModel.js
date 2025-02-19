@@ -24,7 +24,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   admin: Joi.boolean().default(false),
   avatar: Joi.array()
     .items(Joi.string())
-    .default('src/avatars/avatar-origin.jpg'),
+    .default(`https://res.cloudinary.com/${process.env.CLOUD_NAME}/image/upload/v1739989897/images_zbe1i2.jpg`),
   slug: Joi.string().required().trim().strict(),
 
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
@@ -230,12 +230,7 @@ const getAvatar = async userId => {
     const user = await GET_DB()
       .collection(USER_COLLECTION_NAME)
       .findOne({ _id: new ObjectId(userId) });
-    const avatarPath = user.avatar;
-    const content = fs.readFileSync(avatarPath);
-    const extname = path.extname(avatarPath).toLowerCase();
-    const contentType = `image/${extname.slice(1)}`;
-
-    return { content, contentType };
+    return user.avatar;
   } catch (error) {
     throw new Error(error);
   }

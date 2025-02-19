@@ -10,7 +10,15 @@ import { myProfileService } from '~/services/myProfileService.js';
 import { myProfileModel } from '~/models/myProfileModel.js';
 import nodemailer from 'nodemailer';
 import multer from 'multer';
-import path from 'path';
+import cloudinary from 'cloudinary';
+
+
+
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
 
 const createNew = async (req, res, next) => {
   try {
@@ -191,18 +199,8 @@ const changeUsername = async (req, res, next) => {
   }
 };
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './src/avatars'); // Thư mục lưu trữ ảnh
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(
-      null,
-      file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname),
-    );
-  },
-});
+const storage = multer.memoryStorage();
+
 const upload = multer({ storage: storage });
 
 const handleAvatarUpload = (req, res, next) => {
@@ -210,37 +208,64 @@ const handleAvatarUpload = (req, res, next) => {
     if (err) {
       return next(err);
     }
-    next(); // Chuyển đến hàm updateAvatar
+    next();
   });
 };
 
 const updateAvatar = async (req, res, next) => {
   try {
-    console.log(req.file); // Kiểm tra giá trị của req.file
-
     if (!req.file) {
-      // Kiểm tra xem file có tồn tại không
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
     const { userId } = req.params;
-    const avatarUrl = req.file.path;
+
+    // 📌 Hàm upload ảnh lên Cloudinary từ buffer
+    const uploadFromBuffer = (buffer, userId) => {
+      return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.v2.uploader.upload_stream(
+          {
+            folder: "avatars",
+            public_id: `avatar_${userId}`,
+            overwrite: true,
+          },
+          (error, result) => {
+            if (error) {
+              console.error("Cloudinary Upload Error:", error);
+              return reject(error);
+            }
+            resolve(result.secure_url);
+          }
+        );
+        uploadStream.end(buffer);
+      });
+    };
+
+    // 🔹 Chờ Cloudinary upload xong
+    const avatarUrl = await uploadFromBuffer(req.file.buffer, userId);
+    console.log("Avatar URL:", avatarUrl);
+
+    // 🔹 Cập nhật avatar vào database
     await AuthModel.updateAvatar(userId, avatarUrl);
     await myProfileModel.updateAvatar(userId, avatarUrl);
 
-    res.status(StatusCodes.OK).json({ message: 'Avatar updated successfully' });
+    // 🔹 Trả về kết quả
+    res.status(StatusCodes.OK).json({ message: 'Avatar updated successfully', avatarUrl });
+
   } catch (error) {
     next(error);
   }
 };
 
+
 const getAvatar = async (req, res, next) => {
   try {
-    const { content, contentType } = await AuthModel.getAvatar(
-      req.params.userId,
-    );
-    res.setHeader('Content-Type', contentType);
-    res.send(content);
+    const user = await AuthModel.findOneById(req.params.userId);
+    if (!user || !user.avatar) {
+      return res.status(404).json({ message: 'Avatar not found' });
+    }
+    // Trả về URL của avatar
+    res.status(StatusCodes.OK).json({ avatarUrl: user.avatar });
   } catch (error) {
     next(error);
   }

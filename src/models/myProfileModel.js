@@ -20,7 +20,7 @@ const MYPROFILE_COLLECTION_SCHEMA = Joi.object({
   Introduction: Joi.string().max(75).allow(''),
   avatar: Joi.array()
     .items(Joi.string())
-    .default('src/avatars/avatar-origin.jpg'),
+    .default(`https://res.cloudinary.com/${process.env.CLOUD_NAME}/image/upload/v1739989897/images_zbe1i2.jpg`),
 
   // bắt buộc
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
