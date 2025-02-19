@@ -220,7 +220,7 @@ const updateAvatar = async (req, res, next) => {
 
     const { userId } = req.params;
 
-    // 📌 Hàm upload ảnh lên Cloudinary từ buffer
+    //upload ảnh lên Cloudinary từ buffer
     const uploadFromBuffer = (buffer, userId) => {
       return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.v2.uploader.upload_stream(
@@ -231,7 +231,6 @@ const updateAvatar = async (req, res, next) => {
           },
           (error, result) => {
             if (error) {
-              console.error("Cloudinary Upload Error:", error);
               return reject(error);
             }
             resolve(result.secure_url);
@@ -241,15 +240,12 @@ const updateAvatar = async (req, res, next) => {
       });
     };
 
-    // 🔹 Chờ Cloudinary upload xong
+    //Chờ Cloudinary upload xong
     const avatarUrl = await uploadFromBuffer(req.file.buffer, userId);
-    console.log("Avatar URL:", avatarUrl);
 
-    // 🔹 Cập nhật avatar vào database
     await AuthModel.updateAvatar(userId, avatarUrl);
     await myProfileModel.updateAvatar(userId, avatarUrl);
 
-    // 🔹 Trả về kết quả
     res.status(StatusCodes.OK).json({ message: 'Avatar updated successfully', avatarUrl });
 
   } catch (error) {

@@ -119,14 +119,13 @@ const updateAvatar = async (userId, avatarUrl) => {
     // console.log('Updating avatar for userId:', userId); // Log userId
     // console.log('Avatar URL:', avatarUrl); // Log avatarUrl
 
-    const result = await GET_DB()
+    await GET_DB()
       .collection(MYPROFILE_COLLECTION_NAME)
       .updateOne(
         { owner: new ObjectId(userId) },
         { $set: { avatar: avatarUrl } },
       );
 
-    console.log('Update result:', result); // Log the result object
   } catch (error) {
     console.error('Error updating avatar:', error); // Log any errors
     throw new Error(error);
