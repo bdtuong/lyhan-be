@@ -170,7 +170,8 @@ const searchPosts = async (searchTerm) => {
     const results = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)  
       .find(
-      { title: { $regex: searchTerm, $options: 'i' } })
+      { title: { $regex: searchTerm, $options: 'i' },
+      })
       .toArray()
     return results;
   } catch (error) {

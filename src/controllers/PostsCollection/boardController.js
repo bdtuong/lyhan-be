@@ -133,7 +133,7 @@ const getSavedPostsDetails = async (req, res, next) => {
 const getBoards = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const pageSize = 12;
+    const pageSize = 4;
 
     const { boards, totalCount } = await boardService.getBoardsWithPagination(
       page,
