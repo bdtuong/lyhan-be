@@ -110,6 +110,55 @@ const updateOneById = async (id, updateData) => {
   }
 };
 
+const deleteOneById = async (commentId) => {
+  try {
+    const result = await GET_DB()
+      .collection(COMMENT_COLLECTION_NAME)
+      .findOneAndDelete(
+        { _id: new ObjectId(commentId) }
+      );
+    
+    return result
+    
+    // if (result.value) {
+    //   // Document was deleted successfully.  Show notification.
+    //   showNotification("Comment deleted successfully!"); // Call your notification function
+    //   return true; // Indicate success (optional)
+    // } else {
+    //   // Document not found.  You might choose to show a different notification or handle it silently.
+    //   // Example:
+    //   // showNotification("Comment not found."); // Or don't show anything.
+    //   return false; // Indicate failure (optional)
+    // }
+
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    showNotification("Error deleting comment: " + error.message, "error"); // Show error notification
+    return false; // Indicate failure
+  }
+};
+
+
+// // Example notification function (replace with your actual implementation):
+// function showNotification(message, type = "success") {
+//   // Use your preferred notification library or method here.
+//   if (type === "success") {
+//     alert(message); // Simple alert for demonstration.  Use a better method in production.
+//   } else {
+//     alert("Error: " + message); // Example error notification
+//   }
+// }
+
+
+// How to use:
+// const isDeleted = await deleteOneById("theObjectIdString");
+
+// if (isDeleted) {
+//   // Further actions after successful deletion (if needed)
+// } else {
+//   // Handle deletion failure (if needed)
+// }
+
 export const CommentModel = {
   COMMENT_COLLECTION_NAME,
   COMMENT_COLLECTION_SCHEMA,
@@ -117,4 +166,6 @@ export const CommentModel = {
   findOneById,
   getDetails,
   updateOneById,
+  deleteOneById
+
 };

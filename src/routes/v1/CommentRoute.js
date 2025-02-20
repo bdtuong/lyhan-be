@@ -13,4 +13,6 @@ Router3.route('/:id').get(CommentController.getDetails).put;
 
 Router3.route('/:id/vote').post(CommentValidation.vote, CommentController.vote);
 
+Router3.route('/:id/delete').delete(CommentController.deleteComment)
+
 export const CommentRoute = Router3;

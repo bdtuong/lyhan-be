@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import { CommentService } from '~/services/CommentService.js';
+import { CommentModel} from '~/models/commentModel.js'
 
 const createComment = async (req, res, next) => {
   try {
@@ -38,9 +39,15 @@ const updateComment = async (req, res, next) => {
 const deleteComment = async (req, res, next) => {
   try {
     const commentId = req.params.id;
-    const deleted = await CommentService.deleteComment(commentId);
 
-    res.status(StatusCodes.NO_CONTENT).send();
+    // Xóa comment từ MongoDB
+    const deletedComment = await CommentModel.deleteOneById(commentId);
+
+    if (!deletedComment) {
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "Comment not found" });
+    }
+
+    res.status(StatusCodes.OK).json('Delete comment successfully!');
   } catch (error) {
     next(error);
   }
