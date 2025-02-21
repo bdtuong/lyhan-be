@@ -166,11 +166,15 @@ const getBoardsWithPagination = async (page, pageSize) => {
 
 
 const searchPosts = async (searchTerm) => {
-  try{
+  try {
     const results = await GET_DB()
-      .collection(BOARD_COLLECTION_NAME)  
-      .find(
-      { title: { $regex: searchTerm, $options: 'i' },
+      .collection(BOARD_COLLECTION_NAME)
+      .find({
+        $or: [
+          { title: { $regex: searchTerm, $options: 'i' } },
+          { language: { $regex: searchTerm, $options: 'i' } },
+          { username: { $regex: searchTerm, $options: 'i' } },
+        ]
       })
       .toArray()
     return results;
