@@ -268,6 +268,21 @@ const getAvatar = async (req, res, next) => {
 };
 
 
+const deleteSharedPost = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+    const postId = req.params.postId;
+    
+    await AuthModel.deleteSharedPost(userId, postId);
+    await myProfileModel.deleteSharedPost(userId, postId);
+
+    res.status(StatusCodes.OK).json("Delete shared post successfully");
+  } catch (error) {
+    next(error);
+  }
+}
+
+
 export const AuthController = {
   createNew,
   getDetails,
@@ -281,4 +296,5 @@ export const AuthController = {
   updateAvatar,
   handleAvatarUpload,
   getAvatar,
+  deleteSharedPost
 };

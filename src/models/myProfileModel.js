@@ -132,6 +132,20 @@ const updateAvatar = async (userId, avatarUrl) => {
   }
 };
 
+
+const deleteSharedPost = async (userId, postId) => {
+  try {
+    await GET_DB()
+      .collection(MYPROFILE_COLLECTION_NAME)
+      .updateOne(
+        { _id: new ObjectId(postId) },
+        { $pull: { userShareCollectionID: new ObjectId(userId) } },
+      );
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const myProfileModel = {
   MYPROFILE_COLLECTION_NAME,
   MYPROFILE_COLLECTION_SCHEMA,
@@ -143,4 +157,5 @@ export const myProfileModel = {
   findOne,
   validateBeforeCreate,
   updateAvatar,
+  deleteSharedPost,
 };

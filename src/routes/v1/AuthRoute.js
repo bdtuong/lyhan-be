@@ -33,4 +33,6 @@ Router1.route('/avatar/:userId').put(
 
 Router1.route('/get-avatar/:userId').get(AuthController.getAvatar);
 
+Router1.route('/delete-sharedpost/:userId/:postId').put(AuthController.deleteSharedPost);
+
 export const AuthRoute = Router1;
