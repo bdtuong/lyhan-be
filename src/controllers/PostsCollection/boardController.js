@@ -157,9 +157,6 @@ const getBoards = async (req, res) => {
   }
 };
 
-
-
-
 const searchPosts = async (req, res, next) => {
   try {
     const { q: searchTerm } = req.query; 
@@ -178,7 +175,15 @@ const searchPosts = async (req, res, next) => {
   }
 };
 
-
+const deleteSavedPost = async (req, res, next) => {
+  try {
+    const { userId, postId } = req.params;
+    const result = await AuthModel.deleteSavedPost(userId, postId);
+    res.status(StatusCodes.OK).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const boardController = {
   createNew,
@@ -189,4 +194,5 @@ export const boardController = {
   getSavedPostsDetails,
   getBoards,
   searchPosts,
+  deleteSavedPost,
 };
