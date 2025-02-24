@@ -120,10 +120,25 @@ const searchPosts = async (searchTerm) => {
   }
 };
 
+const deletePost = async postId => {
+  try {
+    const result = await boardModel.deletePost(postId);
+
+    if (result.deletedCount === 0) {
+      throw new Error('Delete post failed');
+    }
+
+    return { message: 'Delete post successfully!' };
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const boardService = {
   createNew,
   getDetails,
   shareBoard,
   getBoardsWithPagination,
   searchPosts,
+  deletePost,
 };

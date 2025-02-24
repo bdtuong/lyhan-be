@@ -185,6 +185,16 @@ const deleteSavedPost = async (req, res, next) => {
   }
 };
 
+const deletePost = async (req, res, next) => {
+  try {
+    const postId = req.params.postId;
+    const result = await boardService.deletePost(postId);
+    res.status(StatusCodes.OK).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const boardController = {
   createNew,
   getDetails,
@@ -195,4 +205,5 @@ export const boardController = {
   getBoards,
   searchPosts,
   deleteSavedPost,
+  deletePost
 };
