@@ -261,6 +261,31 @@ const getSavedPostsWithPagination = async (userId, page, pageSize) => {
   }
 };
 
+const getSharedPostsWithPagination = async (userId, page, pageSize) => {
+  try {
+    const skip = (page - 1) * pageSize;
+    const user = await GET_DB()
+    .collection(USER_COLLECTION_NAME)
+    .findOne({ _id: new ObjectId(userId) });
+
+    
+    if (!user) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+    }
+
+    const sharedPosts = user.sharedPosts || []; 
+    const totalCount = sharedPosts.length; 
+
+    
+    return {
+      sharedPosts: sharedPosts.slice(skip, skip + pageSize),
+      totalCount,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const AuthModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
@@ -277,4 +302,5 @@ export const AuthModel = {
   updateAvatar,
   getAvatar,
   getSavedPostsWithPagination,
+  getSharedPostsWithPagination,
 };

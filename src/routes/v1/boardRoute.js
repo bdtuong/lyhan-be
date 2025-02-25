@@ -1,5 +1,4 @@
 import express from 'express';
-import { StatusCodes } from 'http-status-codes';
 import { boardValidation } from '~/validations/boardValidation.js';
 import { boardController } from '~/controllers/PostsCollection/boardController.js';
 
@@ -13,7 +12,7 @@ Router.route('/:boardId/share').post(boardController.shareBoard);
 
 Router.route('/:boardId/save').post(boardController.saveBoard);
 
-Router.route('/details').post(boardController.getSharedPostsDetails);
+Router.route('/shareDetails/:userId').get(boardController.getSharedPostsDetails);
 
 Router.route('/saveDetails/:userId').get(boardController.getSavedPostsDetails);
 

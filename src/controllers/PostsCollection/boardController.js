@@ -67,14 +67,41 @@ const shareBoard = async (req, res, next) => {
 
 const getSharedPostsDetails = async (req, res, next) => {
   try {
-    const { boardIds } = req.body;
-    const posts = await Promise.all(
-      boardIds.map(boardId => boardService.getDetails(boardId)),
+    const userId = req.params.userId;
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = 3;
+
+    const { sharedPosts, totalCount } = await AuthModel.getSharedPostsWithPagination(
+      userId,
+      page,
+      pageSize,
     );
-    res.status(StatusCodes.OK).json(posts);
+
+    const posts = await Promise.all(
+      sharedPosts.map(async boardId => {
+        try {
+          return await boardService.getDetails(boardId.toString());
+        } catch (error) {
+          console.error(`Error fetching board details for ID ${boardId}:`, error);
+          return null;
+        }
+      }),
+    );
+
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    res.status(StatusCodes.OK).json({
+      posts,
+      currentPage: page,
+      totalPages,
+      totalCount,
+    });
   } catch (error) {
     next(error);
   }
+
+
+
 };
 
 const saveBoard = async (req, res, next) => {
@@ -98,7 +125,7 @@ const getSavedPostsDetails = async (req, res, next) => {
   try {
     const userId = req.params.userId; // Lấy userId từ URL params
     const page = parseInt(req.query.page) || 1;
-    const pageSize = 12;
+    const pageSize = 9;
 
     const { savedPosts, totalCount } = await AuthModel.getSavedPostsWithPagination(
       userId,
@@ -112,7 +139,7 @@ const getSavedPostsDetails = async (req, res, next) => {
           return await boardService.getDetails(boardId.toString());
         } catch (error) {
           console.error(`Error fetching board details for ID ${boardId}:`, error);
-          return null; 
+          return null;
         }
       }),
     );
@@ -133,7 +160,7 @@ const getSavedPostsDetails = async (req, res, next) => {
 const getBoards = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const pageSize = 4;
+    const pageSize = 9;
 
     const { boards, totalCount } = await boardService.getBoardsWithPagination(
       page,
@@ -162,15 +189,14 @@ const getBoards = async (req, res) => {
 
 const searchPosts = async (req, res, next) => {
   try {
-    const { q: searchTerm } = req.query; 
+    const { q: searchTerm } = req.query;
     const { error } = Joi.object({
-      q: Joi.string().required().min(0).max(50), 
+      q: Joi.string().required().min(0).max(50),
     }).validate(req.query);
 
     if (error) {
       return next(new ApiError(StatusCodes.BAD_REQUEST, error.details[0].message));
     }
-
     const results = await boardService.searchPosts(searchTerm);
     res.status(StatusCodes.OK).json(results);
   } catch (error) {
