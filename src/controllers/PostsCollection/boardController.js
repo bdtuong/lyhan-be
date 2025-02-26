@@ -69,7 +69,15 @@ const getSharedPostsDetails = async (req, res, next) => {
   try {
     const { boardIds } = req.body;
     const posts = await Promise.all(
-      boardIds.map(boardId => boardService.getDetails(boardId)),
+      boardIds.map(async boardId => { 
+        try {
+          const board = await boardService.getDetails(boardId.toString());
+          return board && board._id ? board : { _id: boardId, deleted: true };
+        } catch (error) {
+          console.error(`Error fetching board details for ID ${boardId}:`, error);
+          return { _id: boardId, deleted: true };
+        }
+      }),
     );
     res.status(StatusCodes.OK).json(posts);
   } catch (error) {
@@ -109,10 +117,11 @@ const getSavedPostsDetails = async (req, res, next) => {
     const posts = await Promise.all(
       savedPosts.map(async boardId => {
         try {
-          return await boardService.getDetails(boardId.toString());
+          const board = await boardService.getDetails(boardId.toString());
+          return board && board._id ? board : { _id: boardId, deleted: true };
         } catch (error) {
           console.error(`Error fetching board details for ID ${boardId}:`, error);
-          return null; 
+          return { _id: boardId, deleted: true };
         }
       }),
     );
