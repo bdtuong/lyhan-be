@@ -72,10 +72,10 @@ const getSharedPostsDetails = async (req, res, next) => {
       boardIds.map(async boardId => { 
         try {
           const board = await boardService.getDetails(boardId.toString());
-          return board && board._id ? board : { _id: boardId, deleted: true };
+          return board && board._id ? board : { _id: boardId};
         } catch (error) {
           console.error(`Error fetching board details for ID ${boardId}:`, error);
-          return { _id: boardId, deleted: true };
+          return { _id: boardId};
         }
       }),
     );
