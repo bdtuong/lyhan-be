@@ -183,6 +183,22 @@ const searchPosts = async (searchTerm) => {
   }
 };
 
+const deletePost = async (postId) => {
+  try {
+    const result = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .deleteOne(
+        { _id: new ObjectId(postId) },
+      );
+    if (!result.acknowledged) {
+      throw new Error('Delete post failed');
+    }
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
@@ -192,4 +208,5 @@ export const boardModel = {
   updateUserShare,
   getBoardsWithPagination,
   searchPosts,
+  deletePost
 };

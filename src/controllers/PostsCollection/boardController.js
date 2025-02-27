@@ -76,14 +76,14 @@ const getSharedPostsDetails = async (req, res, next) => {
       page,
       pageSize,
     );
-
     const posts = await Promise.all(
-      sharedPosts.map(async boardId => {
+      sharedPosts.map(async boardId => { 
         try {
-          return await boardService.getDetails(boardId.toString());
+          const board = await boardService.getDetails(boardId.toString());
+          return board && board._id ? board : { _id: boardId};
         } catch (error) {
           console.error(`Error fetching board details for ID ${boardId}:`, error);
-          return null;
+          return { _id: boardId};
         }
       }),
     );
@@ -136,10 +136,11 @@ const getSavedPostsDetails = async (req, res, next) => {
     const posts = await Promise.all(
       savedPosts.map(async boardId => {
         try {
-          return await boardService.getDetails(boardId.toString());
+          const board = await boardService.getDetails(boardId.toString());
+          return board && board._id ? board : { _id: boardId, deleted: true };
         } catch (error) {
           console.error(`Error fetching board details for ID ${boardId}:`, error);
-          return null;
+          return { _id: boardId, deleted: true };
         }
       }),
     );
@@ -184,9 +185,6 @@ const getBoards = async (req, res) => {
   }
 };
 
-
-
-
 const searchPosts = async (req, res, next) => {
   try {
     const { q: searchTerm } = req.query;
@@ -204,7 +202,25 @@ const searchPosts = async (req, res, next) => {
   }
 };
 
+const deleteSavedPost = async (req, res, next) => {
+  try {
+    const { userId, postId } = req.params;
+    const result = await AuthModel.deleteSavedPost(userId, postId);
+    res.status(StatusCodes.OK).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
 
+const deletePost = async (req, res, next) => {
+  try {
+    const postId = req.params.postId;
+    const result = await boardService.deletePost(postId);
+    res.status(StatusCodes.OK).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const boardController = {
   createNew,
@@ -215,4 +231,6 @@ export const boardController = {
   getSavedPostsDetails,
   getBoards,
   searchPosts,
+  deleteSavedPost,
+  deletePost
 };

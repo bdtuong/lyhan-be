@@ -286,6 +286,32 @@ const getSharedPostsWithPagination = async (userId, page, pageSize) => {
   }
 };
 
+const deleteSharedPost = async (userId, postId) => {
+  try {
+    await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .updateOne(
+        { _id: new ObjectId(userId) },
+        { $pull: { sharedPosts: new ObjectId(postId) } },
+      );
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+const deleteSavedPost = async (userId, postId) => {
+  try {
+    await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .updateOne(
+        { _id: new ObjectId(userId) },
+        { $pull: { savedPosts: new ObjectId(postId) } },
+      );
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
 export const AuthModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
@@ -303,4 +329,6 @@ export const AuthModel = {
   getAvatar,
   getSavedPostsWithPagination,
   getSharedPostsWithPagination,
+  deleteSharedPost,
+  deleteSavedPost,
 };

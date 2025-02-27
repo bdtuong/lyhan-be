@@ -19,4 +19,8 @@ Router.route('/saveDetails/:userId').get(boardController.getSavedPostsDetails);
 Router.route('/pagination/pagenumber').get(boardController.getBoards);
 
 Router.route('/search/content').get(boardController.searchPosts);
+
+Router.route('/delete-savedpost/:userId/:postId').put(boardController.deleteSavedPost);
+
+Router.route('/delete-post/:postId').delete(boardController.deletePost);
 export const boardRoute = Router;
