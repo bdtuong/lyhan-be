@@ -4,8 +4,6 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators.js';
 import { GET_DB } from '~/config/mongodb.js';
 import bcrypt from 'bcrypt';
 import { boardModel } from './boardModel.js';
-import fs from 'fs';
-import path from 'path';
 
 // Define Collection (name & schema)
 const USER_COLLECTION_NAME = 'Users';
@@ -26,6 +24,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
     .items(Joi.string())
     .default(`https://res.cloudinary.com/${process.env.CLOUD_NAME}/image/upload/v1739989897/images_zbe1i2.jpg`),
   slug: Joi.string().required().trim().strict(),
+  notificationId: Joi.string().default(null),
 
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
@@ -286,6 +285,17 @@ const getSharedPostsWithPagination = async (userId, page, pageSize) => {
   }
 };
 
+const updateOne = async (filter, update) => {
+  try {
+    const result = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .updateOne(filter, update);
+    return result;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 const deleteSharedPost = async (userId, postId) => {
   try {
     await GET_DB()
@@ -331,4 +341,5 @@ export const AuthModel = {
   getSharedPostsWithPagination,
   deleteSharedPost,
   deleteSavedPost,
+  updateOne,
 };

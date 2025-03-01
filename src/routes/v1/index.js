@@ -7,6 +7,7 @@ import { UserRoute } from './UserRoute.js';
 import { CommentRoute } from './CommentRoute.js';
 import { myProfileRoute } from './myProfileRoute.js';
 import { CommentInclineRoute } from './commentInlineRoute.js';
+import { notificationRoute }  from './notificationRoute.js';
 const Router = express.Router();
 
 //Check APIs v1/status
@@ -31,5 +32,8 @@ Router.use('/myProfile', myProfileRoute);
 
 // comment inline
 Router.use('/commentinline', CommentInclineRoute);
+
+// notification
+Router.use('/notification', notificationRoute);
 
 export const APIs_V1 = Router;

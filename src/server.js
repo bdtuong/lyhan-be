@@ -9,10 +9,58 @@ import { APIs_V1 } from './routes/v1/index.js';
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware.js';
 import cookieParser from 'cookie-parser';
 import 'module-alias/register';
+import { Server } from 'socket.io';
+import http from 'http';
+import { ObjectId } from 'mongodb';
+import { WHITELIST_DOMAINS } from '~/utils/constant.js';
+import { AuthModel } from './models/AuthModel.js';
+
+
 
 const START_SERVER = () => {
   //xu ly cors
   const app = express();
+  const server = http.createServer(app);
+
+  const io = new Server(server, {
+    cors: {
+      origin: WHITELIST_DOMAINS,
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      credentials: true,
+    },
+    transports: ["websocket", "polling"],
+  });
+  app.set('socketio', io);
+
+  // Xử lý kết nối Socket.IO
+  io.on('connection', (socket) => {
+    console.log('Client connected:', socket.id);
+  
+    // Lưu socket.id vào user khi client gửi userId
+    socket.on('registerUser', async (userId) => {
+      try {
+        await AuthModel.updateOne(
+          { _id: new ObjectId(userId) }, // Filter
+          { $set: { notificationId: socket.id } } // Update
+        );
+        socket.join(userId);
+      } catch (error) {
+        console.error('Error updating notificationId:', error);
+      }
+    });
+  
+    // Xóa socket.id khi disconnect
+    socket.on('disconnect', async () => {
+      try {
+        await AuthModel.updateOne(
+          { notificationId: socket.id }, // Filter
+          { $set: { notificationId: null } } // Update
+        );
+      } catch (error) {
+        console.error('Error clearing notificationId:', error);
+      }
+    });
+  });
 
   // Sử dụng cookie-parser để xử lý cookies
   app.use(cookieParser());
@@ -28,7 +76,7 @@ const START_SERVER = () => {
   //middleware xử lý lỗi tập trung
   app.use(errorHandlingMiddleware);
 
-  app.listen(env.APP_PORT, env.APP_HOST, () => {
+  server.listen(env.APP_PORT, env.APP_HOST, () => {
     console.log(`3. Hello ${env.AUTHOR}, We are running at ${env.APP_PORT}`);
   });
   //Thực hiện cleanup trước khi dừng server
