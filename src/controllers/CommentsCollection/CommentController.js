@@ -1,6 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
 import { CommentService } from '~/services/CommentService.js';
 import { CommentModel} from '~/models/commentModel.js';
+import { GET_DB } from '~/config/mongodb.js';
+import { AuthModel } from '~/models/AuthModel.js';
 
 const createComment = async (req, res, next) => {
   try {
