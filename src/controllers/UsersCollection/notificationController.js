@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
-import { NotificationModel } from '~/models/NotificationModel.js';
+import { NotificationModel } from '~/models/notificationModel.js';
 import { AuthModel } from '~/models/AuthModel.js';
 
 const createNotification = async (req, res) => {
