@@ -87,6 +87,21 @@ const vote = async (req, res, next) => {
     }
 
     res.status(200).json(updatedComment);
+
+    const board = await GET_DB()
+      .collection('boards')
+      .findOne({ _id: new ObjectId(req.body.boardId) });
+
+    const ownerUserId = board?.userId;
+
+    if (ownerUserId) {
+      const io = req.app.get('socketio');
+      const owner = await AuthModel.findOneById(ownerUserId);
+      
+      if (owner?.notificationId) {
+        io.to(owner.notificationId).emit('newNotification');
+      }
+    }
   } catch (error) {
     next(error);
   }

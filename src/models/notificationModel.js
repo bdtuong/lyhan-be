@@ -10,6 +10,8 @@ const NOTIFICATION_COLLECTION_SCHEMA = Joi.object({
     message: Joi.string().required(),
     isRead: Joi.boolean().default(false),
     type: Joi.string().valid('comment','rating','inline'),
+    owner: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    commentId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE).allow(null),
 
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
     updatedAt: Joi.date().timestamp('javascript').default(null),
@@ -32,10 +34,14 @@ const createNotification = async (data) => {
             isRead: false,
             createdAt: new Date(),
         };
+        if (notification.type === 'rating') {
+            await GET_DB().collection(NOTIFICATION_COLLECTION_NAME)
+                        .findOneAndDelete({commentId: notification.commentId, owner: notification.owner })
+        }
         const result = await GET_DB()
             .collection(NOTIFICATION_COLLECTION_NAME)
             .insertOne(notification);
-
+        
         return result;
     } catch (error) {
         throw new Error(error);

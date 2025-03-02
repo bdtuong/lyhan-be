@@ -4,15 +4,17 @@ import { AuthModel } from '~/models/AuthModel.js';
 
 const createNotification = async (req, res) => {
     try {
-        const { userId, postId, message, type } = req.body;
+        const { userId, postId, owner, commentId, message, type } = req.body;
         
-        if (!userId || !postId || !message || !type) {
+        if (!userId || !postId || !owner || !message || !type) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
         const newNotification = await NotificationModel.createNotification({ 
             userId, 
-            postId, 
+            postId,
+            owner,
+            commentId,
             message, 
             type 
         });
