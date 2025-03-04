@@ -4,6 +4,7 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators.js';
 import { GET_DB } from '~/config/mongodb.js';
 import { CommentModel } from './commentModel.js';
 import { CommentInlineModel } from './commentInlineModel.js';
+import {AuthModel} from '~/models/AuthModel.js';
 
 // Define Collection (name & schema)
 const BOARD_COLLECTION_NAME = 'boards';
@@ -168,14 +169,30 @@ const searchPosts = async (searchTerm) => {
   try {
     const results = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
-      .find({
-        $or: [
-          { title: { $regex: searchTerm, $options: 'i' } },
-          { language: { $regex: searchTerm, $options: 'i' } },
-          { username: { $regex: searchTerm, $options: 'i' } },
-        ]
-      })
-      .toArray()
+      .aggregate([
+        {
+          $lookup: {
+            from: AuthModel.USER_COLLECTION_NAME,
+            localField: 'userID',
+            foreignField: '_id',
+            as: 'userInfo',
+          },
+        },
+        {
+          $unwind: '$userInfo',
+        },
+        {
+          $match: {
+            $or: [
+              { title: { $regex: searchTerm, $options: 'i' } },
+              { language: { $regex: searchTerm, $options: 'i' } },
+              { 'userInfo.username': { $regex: searchTerm, $options: 'i' } },
+            ],
+          },
+        },
+      ])
+      .toArray();
+
     return results;
   } catch (error) {
     throw error;
