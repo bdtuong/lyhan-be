@@ -43,7 +43,6 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   description: Joi.string().required().max(60).trim(),
   language: Joi.string().required().max(60).trim(),
   content: Joi.string().required(),
-  username: Joi.string().required(),
 
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
