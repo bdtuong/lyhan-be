@@ -248,11 +248,12 @@ const getSavedPostsWithPagination = async (userId, page, pageSize) => {
     }
 
     const savedPosts = user.savedPosts || []; // Lấy danh sách savedPosts từ user
+    const reversedSavedPosts = savedPosts.reverse();
     const totalCount = savedPosts.length; // Tổng số savedPosts
 
     // Trả về danh sách savedPosts đã phân trang và tổng số lượng
     return {
-      savedPosts: savedPosts.slice(skip, skip + pageSize),
+      savedPosts: reversedSavedPosts.slice(skip, skip + pageSize),
       totalCount,
     };
   } catch (error) {
