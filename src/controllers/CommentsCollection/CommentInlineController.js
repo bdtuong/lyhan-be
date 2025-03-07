@@ -6,7 +6,7 @@ import { AuthModel } from '~/models/AuthModel.js';
 const createComment = async (req, res, next) => {
   try {
     const createdComment = await CommentInlineService.createComment(req.body);
-    res.status(StatusCodes.CREATED).json(createdComment);
+    res.status(StatusCodes.CREATED).json({createdComment});
 
     const board = await GET_DB()
       .collection('boards')
@@ -56,8 +56,10 @@ const deleteComment = async (req, res, next) => {
   try {
     const commentId = req.params.id;
     const deleted = await CommentInlineService.deleteComment(commentId);
-
-    res.status(StatusCodes.NO_CONTENT).send();
+    if (!deleted) {
+      return res.status(StatusCodes.NOT_FOUND).json({ message: 'Comment inline not found' });
+    }
+    res.status(StatusCodes.OK).json({ message: 'Delete comment inline successfully' });
   } catch (error) {
     next(error);
   }

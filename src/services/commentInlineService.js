@@ -15,12 +15,7 @@ const createComment = async reqBody => {
     // Save the new comment to the database
     const createdComment = await CommentInlineModel.createComment(commentData);
 
-    // Retrieve the comment after creation
-    const getNewComment = await CommentInlineModel.findOneById(
-      createdComment.insertedId,
-    );
-
-    return getNewComment;
+    return createdComment;
   } catch (error) {
     throw error;
   }
@@ -55,17 +50,15 @@ const updateComment = async (commentId, updateData) => {
   }
 };
 
-const deleteComment = async commentId => {
+const deleteComment = async (commentId) => {
   try {
-    const deleted = await CommentInlineModel.deleteOneById(
-      new ObjectId(commentId),
-    );
-    if (!deleted) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Comment not found!');
+    const result = await CommentInlineModel.deleteComment(commentId);
+    if (!result) {
+      throw new Error('Comment inline not found');
     }
-    return deleted;
+    return true;
   } catch (error) {
-    throw error;
+    throw new Error(error.message);
   }
 };
 
@@ -81,6 +74,7 @@ const getSortedComments = async postId => {
     throw error;
   }
 };
+
 
 export const CommentInlineService = {
   createComment,

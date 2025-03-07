@@ -33,15 +33,19 @@ const validateBeforeCreate = async data => {
   });
 };
 
-const createComment = async data => {
+const createComment = async (data) => {
   try {
     const validData = await validateBeforeCreate(data);
-    const createdComment = await GET_DB()
+    const result = await GET_DB()
       .collection(COMMENT_COLLECTIONINLINE_NAME)
       .insertOne(validData);
-
-    return createdComment;
+    if (!result.insertedId) {
+      throw new Error('Failed to insert comment into database');
+    }
+    const insertedComment = await findOneById(result.insertedId); // Lấy comment vừa insert
+    return insertedComment; // Trả về comment đầy đủ với _id
   } catch (error) {
+    console.error('Error in createComment model:', error);
     throw new Error(error);
   }
 };
@@ -82,10 +86,22 @@ const getDetails = async id => {
   }
 };
 
+const deleteComment = async (commentId) => {
+  try {
+    const result = await GET_DB()
+      .collection(COMMENT_COLLECTIONINLINE_NAME)
+      .deleteOne({ _id: new ObjectId(commentId) });
+    return result.deletedCount > 0;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const CommentInlineModel = {
   COMMENT_COLLECTIONINLINE_NAME,
   COMMENT_COLLECTIONINLINE_SCHEMA,
   createComment,
   findOneById,
   getDetails,
+  deleteComment,
 };

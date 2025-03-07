@@ -10,5 +10,6 @@ Router5.route('/').post(
 );
 
 Router5.route('/:id').get(CommentInclineController.getDetails).put;
+Router5.route('/:id/delete').delete(CommentInclineController.deleteComment);
 
 export const CommentInclineRoute = Router5;
