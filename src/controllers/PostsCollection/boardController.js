@@ -69,7 +69,7 @@ const getSharedPostsDetails = async (req, res, next) => {
   try {
     const userId = req.params.userId;
     const page = parseInt(req.query.page) || 1;
-    const pageSize = 2.9;
+    const pageSize = 3;
 
     const { sharedPosts, totalCount } = await AuthModel.getSharedPostsWithPagination(
       userId,
