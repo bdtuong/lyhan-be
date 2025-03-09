@@ -158,6 +158,9 @@ const resetPassword = async (token, email, password, confirmPassword) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Passwords do not match');
     }
 
+    if (resetPasswordExpires < Date.now()) {
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Token has expired');
+    }
     // Hash mật khẩu mới
     const hashedPassword = await bcrypt.hash(password, 10);
 
