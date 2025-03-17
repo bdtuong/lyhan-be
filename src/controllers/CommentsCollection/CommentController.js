@@ -73,7 +73,7 @@ const deleteComment = async (req, res, next) => {
 
 const vote = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params;     
     const { type, userId } = req.body;
 
     // In ra commentId để kiểm tra(sài để debug)
