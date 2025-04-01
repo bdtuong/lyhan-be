@@ -2,70 +2,72 @@
 
 ![image](https://github.com/user-attachments/assets/9592e1bc-5cd9-4afe-9ba0-6ac0ac2a2c65)
 
-## WorkFlow của database
+## WorkFlow of database
 
 ![Screenshot 2025-01-05 234949](https://github.com/user-attachments/assets/3da3efd7-496d-4d32-b146-dee82e17ddd1)
+# README
 
-## Mục lục
+## Table of Contents  
 
-- [Tính năng](#tính-năng)
-- [Công nghệ sử dụng](#công-nghệ-sử-dụng)
-- [Cài đặt](#cài-đặt)
-- [Sử dụng](#sử-dụng)
+- [Features](#features)  
+- [Technologies Used](#technologies-used)  
+- [Installation](#installation)  
+- [Usage](#usage)  
 
-## Tính năng
+## Features  
 
-Liệt kê các tính năng chính của backend:
+List the main features of the backend:  
 
-- Xác thực người dùng (Đăng nhập, Đăng ký, Đăng Xuất)
-- Share post, comment
-- Storage
-- Discussion
-- Profile Users
+- User authentication (Login, Register, Logout)  
+- Share posts, comments  
+- Storage  
+- Discussion  
+- User Profiles  
 
-## Công nghệ sử dụng
+## Technologies Used  
 
-Liệt kê các công nghệ, ngôn ngữ và thư viện được sử dụng. Ví dụ:
+List the technologies, languages, and libraries used. For example:  
 
-- Node.js
-- Express.js
-- MongoDB
-- JWT (JSON Web Token)
-- Joi
-- các thư viện nhỏ khác
+- Node.js  
+- Express.js  
+- MongoDB  
+- JWT (JSON Web Token)  
+- Joi  
+- Other small libraries  
 
-## Cài đặt
+## Installation  
 
-Hướng dẫn chi tiết cách cài đặt và thiết lập môi trường. Ví dụ:
+Detailed instructions on how to install and set up the environment. For example:  
 
-1.  Clone repository:
+1. Clone the repository:  
 
     ```bash
     git clone https://github.com/waanney/scout_backend.git
-    ```
+    ```  
 
-2.  Di chuyển vào thư mục dự án:
+2. Navigate to the project directory:  
 
     ```bash
     cd scout_backend
-    ```
+    ```  
 
-3.  Cài đặt các dependencies:
+3. Install dependencies:  
 
     ```bash
     npm install
-    ```
+    ```  
 
-4.  Tạo file `.env` liên hệ
+4. Create a `.env` file for configuration  
 
-## Sử dụng
+## Usage  
 
-Hướng dẫn cách chạy ứng dụng và sử dụng các API. Ví dụ:
+Instructions on how to run the application and use the API. For example:  
 
-1.  Khởi động server:
+1. Start the server:  
 
     ```bash
     npm run dev
-    ```
+    ```  
 
-2.  Truy cập API tại `http://localhost:8017`
+2. Access the API at `http://localhost:8017`
+
