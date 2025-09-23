@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "prepare": "husky",
     "format": "prettier .  --write",
-    "clean": "rmdir /s build && mkdir build",
+    "clean": "rimraf build",
     "build-babel": "babel ./src -d ./build/src",
     "build": "npm run clean && npm run build-babel",
     "production": "cross-env BUILD_MODE=production node ./build/src/server.js",
@@ -63,7 +63,8 @@
     "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
     "nodemon": "^3.0.1",
-    "prettier": "^3.4.1"
+    "prettier": "^3.4.1",
+    "rimraf": "^6.0.1"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
