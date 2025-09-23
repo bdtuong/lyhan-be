@@ -4,15 +4,23 @@ import { CommentController } from '~/controllers/CommentsCollection/CommentContr
 
 const Router3 = express.Router();
 
-Router3.route('/').post(
-  CommentValidation.createComment,
-  CommentController.createComment,
-);
+// tạo comment gốc
+Router3.post('/', CommentValidation.createComment, CommentController.createComment);
 
-Router3.route('/:id').get(CommentController.getDetails).put;
+// reply vào comment
+Router3.post('/:commentId/replies', CommentValidation.createComment, CommentController.replyComment);
 
-Router3.route('/:id/vote').post(CommentValidation.vote, CommentController.vote);
+// lấy comments theo board (đặt trước /:id để tránh conflict)
+Router3.get('/board/:boardId', CommentController.getByBoard);
 
-Router3.route('/:id/delete').delete(CommentController.deleteComment)
+// lấy chi tiết 1 comment
+Router3.get('/:id', CommentController.getDetails);
+
+// vote comment
+Router3.post('/:id/vote', CommentValidation.vote, CommentController.vote);
+
+// xóa comment
+Router3.delete('/:id/delete', CommentController.deleteComment);
+
 
 export const CommentRoute = Router3;
