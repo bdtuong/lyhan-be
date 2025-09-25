@@ -22,7 +22,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   admin: Joi.boolean().default(false),
   avatar: Joi.array()
     .items(Joi.string())
-    .default(`https://res.cloudinary.com/${process.env.CLOUD_NAME}/image/upload/v1739989897/images_zbe1i2.jpg`),
+    .default(`https://res.cloudinary.com/${process.env.CLOUD_NAME}/image/upload/v1758730740/images_yiv9o4.png`),
   slug: Joi.string().required().trim().strict(),
   notificationId: Joi.string().default(null),
 
