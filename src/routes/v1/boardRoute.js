@@ -44,6 +44,12 @@ Router.route('/delete-post/:postId').delete(boardController.deletePost);
 // 🟢 Toggle like/unlike (để dưới cùng trước getDetails)
 Router.route('/:id/like').post(boardController.toggleLike);
 
+// 🟢 Update post
+Router.route('/update-post/:postId').put(
+  upload.array('images', 5),
+  boardController.updateBoard
+);
+
 // 🟢 Lấy chi tiết board theo id (⚠️ để CUỐI CÙNG)
 Router.route('/:id').get(boardController.getDetails);
 

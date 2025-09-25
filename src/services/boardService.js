@@ -188,6 +188,25 @@ const getBoardsByUser = async (userId, page, pageSize) => {
   }
 };
 
+// 🟢 Update board
+const updateBoard = async (postId, updateData) => {
+  try {
+    updateData.updatedAt = new Date() // model cũng set, nhưng set ở đây không sao
+
+    const updatedBoard = await boardModel.updateBoard(postId, updateData)
+    if (!updatedBoard) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found to update')
+    }
+    return updatedBoard
+  } catch (error) {
+    if (error instanceof ApiError) throw error
+    throw new ApiError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Error while updating board: ' + error.message
+    )
+  }
+}
+
 export const boardService = {
   createNew,
   getDetails,
@@ -197,5 +216,6 @@ export const boardService = {
   deletePost,
   toggleLike,
   getBoardsByHashtag,
-  getBoardsByUser
+  getBoardsByUser,
+  updateBoard
 };

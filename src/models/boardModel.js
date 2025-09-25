@@ -416,6 +416,31 @@ const deletePost = async (postId) => {
   }
 };
 
+const updateBoard = async (postId, updateData) => {
+  try {
+    if (!isValidObjectId(postId)) return null
+
+    // Nếu có content mới thì parse lại hashtags
+    if (updateData.content) {
+      updateData.hashtags = extractHashtags(updateData.content)
+    }
+
+    updateData.updatedAt = new Date().getTime()
+
+    const result = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(postId) },
+        { $set: updateData },
+        { returnDocument: "after" }
+      )
+
+    return result.value
+  } catch (error) {
+    throw error
+  }
+}
+
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
@@ -428,5 +453,6 @@ export const boardModel = {
   searchPosts,
   deletePost,
   getBoardsByHashtag,
-  getBoardsByUser, // 🆕 export thêm
+  getBoardsByUser,
+  updateBoard // 🆕 export thêm
 };
