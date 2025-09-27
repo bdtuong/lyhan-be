@@ -130,35 +130,36 @@ const changePassword = async (req, res, next) => {
 
 const forgotPassword = async (req, res, next) => {
   try {
-    const Email = req.body;
-    const email = Email.Email;
+    const { Email: email } = req.body;
+    if (!email) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Email is required');
+    }
+
     const resetToken = await AuthService.generateResetPasswordToken(email);
 
-    // Tạo transporter
+    // ✅ Transporter SendGrid
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: 'SendGrid',
       auth: {
-        user: process.env.EMAIL_URL,
-        pass: process.env.EMAIL_PASS,
+        user: 'apikey', // luôn để nguyên
+        pass: process.env.SENDGRID_API_KEY,
       },
-      logger: true,
-      debug: true
     });
 
-    // Tạo nội dung email
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}?email=${email}`;
+
     const mailOptions = {
       from: process.env.EMAIL_URL,
       to: email,
       subject: 'Password Reset Request',
       html: `
-                <p>You are receiving this email because you (or someone else) has requested the reset of the password for your account.</p>
-                <p>Please click on the following link, or paste this into your browser to complete the process:</p>
-                <a href="${process.env.FRONTEND_URL}/reset-password/${resetToken}?email=${email}">${process.env.FRONTEND_URL}/reset-password/${resetToken}?email=${email}</a>
-                <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
-            `,
+        <p>You requested a password reset for your account.</p>
+        <p>Click this link to reset your password:</p>
+        <a href="${resetLink}">${resetLink}</a>
+        <p>If you did not request this, please ignore this email.</p>
+      `,
     };
 
-    // Gửi email
     await transporter.sendMail(mailOptions);
 
     res.status(StatusCodes.OK).json({ message: 'Password reset email sent' });
