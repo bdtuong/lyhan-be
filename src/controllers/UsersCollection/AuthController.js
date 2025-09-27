@@ -141,6 +141,8 @@ const forgotPassword = async (req, res, next) => {
         user: process.env.EMAIL_URL,
         pass: process.env.EMAIL_PASS,
       },
+      logger: true,
+      debug: true
     });
 
     // Tạo nội dung email
