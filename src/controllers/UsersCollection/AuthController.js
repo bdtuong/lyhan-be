@@ -128,45 +128,50 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-const forgotPassword = async (req, res, next) => {
+const forgotPassword = async (req, res) => {
   try {
     const { Email: email } = req.body;
-    if (!email) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Email is required');
-    }
+    console.log("A) start forgotPassword", { email, hasKey: !!process.env.SENDGRID_API_KEY, from: process.env.EMAIL_FROM, fe: process.env.FRONTEND_URL });
+
+    if (!email) return res.status(400).json({ message: "Email is required" });
 
     const resetToken = await AuthService.generateResetPasswordToken(email);
+    console.log("B) token generated", !!resetToken);
 
-    // ✅ Transporter SendGrid
     const transporter = nodemailer.createTransport({
-      service: 'SendGrid',
-      auth: {
-        user: 'apikey', // luôn để nguyên
-        pass: process.env.SENDGRID_API_KEY,
-      },
+      service: "SendGrid",
+      auth: { user: "apikey", pass: process.env.SENDGRID_API_KEY },
+      logger: true, // bật logger của nodemailer
+      debug: true,  // bật debug SMTP (in ra log chi tiết)
     });
 
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}?email=${email}`;
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}?email=${encodeURIComponent(email)}`;
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM,
+      from: process.env.EMAIL_FROM, // phải là sender đã verify
       to: email,
-      subject: 'Password Reset Request',
-      html: `
-        <p>You requested a password reset for your account.</p>
-        <p>Click this link to reset your password:</p>
-        <a href="${resetLink}">${resetLink}</a>
-        <p>If you did not request this, please ignore this email.</p>
-      `,
+      subject: "Password Reset Request",
+      html: `<p>Click:</p><a href="${resetLink}">${resetLink}</a>`
     };
 
+    console.log("C) sending mail...");
     await transporter.sendMail(mailOptions);
+    console.log("D) mail sent");
 
-    res.status(StatusCodes.OK).json({ message: 'Password reset email sent' });
-  } catch (error) {
-    next(error);
+    return res.status(200).json({ message: "✅ Email đã được gửi. Hãy kiểm tra cả Spam/Junk." });
+  } catch (err) {
+    // Log lỗi chi tiết để đọc trong Render Logs
+    console.error("forgotPassword ERROR:", {
+      name: err?.name,
+      message: err?.message,
+      code: err?.code,
+      response: err?.response?.body
+    });
+    // Trả JSON để FE không pending
+    return res.status(500).json({ message: err?.response?.body || err?.message || "Internal Server Error" });
   }
 };
+
 
 const resetPassword = async (req, res, next) => {
   try {
