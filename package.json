@@ -16,10 +16,10 @@
     "start": "cross-env BUILD_MODE=production node ./build/src/server.js",
     "production": "cross-env BUILD_MODE=production node ./build/src/server.js",
     "dev": "cross-env BUILD_MODE=dev nodemon --exec babel-node ./src/server.js"
-
   },
   "dependencies": {
     "@babel/runtime": "^7.22.10",
+    "@sendgrid/mail": "^8.1.6",
     "@tanstack/react-query": "^4.36.1",
     "@types/bcryptjs": "^2.4.6",
     "async-exit-hook": "^2.0.1",
