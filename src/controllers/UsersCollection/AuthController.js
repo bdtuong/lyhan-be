@@ -149,7 +149,7 @@ const forgotPassword = async (req, res, next) => {
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}?email=${email}`;
 
     const mailOptions = {
-      from: process.env.EMAIL_URL,
+      from: process.env.EMAIL_FROM,
       to: email,
       subject: 'Password Reset Request',
       html: `
