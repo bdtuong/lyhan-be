@@ -9,12 +9,11 @@ const createNew = async (reqBody) => {
     const objectId = {
       ...reqBody,
       userID: new ObjectId(reqBody.userId), // đồng bộ field userID để join sang AuthModel
-      images: reqBody.images || [],         // đảm bảo luôn có mảng images
+      images: reqBody.images || []          // đảm bảo luôn có mảng images
+      // isPending mặc định true ở schema (model)
     };
 
     const createdBoard = await boardModel.createNew(objectId);
-
-    // 🟢 Trả luôn object vừa tạo (giữ nguyên cách cũ)
     return { ...objectId, _id: createdBoard.insertedId };
   } catch (error) {
     throw new ApiError(
@@ -24,10 +23,10 @@ const createNew = async (reqBody) => {
   }
 };
 
-// 🟢 Lấy chi tiết board theo id
-const getDetails = async (boardId) => {
+// 🟢 Lấy chi tiết board theo id (mặc định ẩn pending)
+const getDetails = async (boardId, includePending = false) => {
   try {
-    const board = await boardModel.getDetails(boardId);
+    const board = await boardModel.getDetails(boardId, { includePending });
     if (!board) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found!');
     }
@@ -45,11 +44,9 @@ const getDetails = async (boardId) => {
 const shareBoard = async (boardId, userId) => {
   try {
     const result = await boardModel.updateUserShare(boardId, userId);
-
     if (!result.acknowledged) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Share board failed');
     }
-
     return { message: 'Chia sẻ board thành công' };
   } catch (error) {
     if (error instanceof ApiError) throw error;
@@ -60,18 +57,17 @@ const shareBoard = async (boardId, userId) => {
   }
 };
 
-// 🟢 Lấy boards có phân trang
-const getBoardsWithPagination = async (page, pageSize) => {
+// 🟢 Lấy boards có phân trang (mặc định ẩn pending)
+const getBoardsWithPagination = async (page, pageSize, includePending = false) => {
   try {
     const { boards, totalCount } = await boardModel.getBoardsWithPagination(
       page,
-      pageSize
+      pageSize,
+      { includePending }
     );
-
     if (!boards) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Boards not found');
     }
-
     return { boards, totalCount };
   } catch (error) {
     if (error instanceof ApiError) throw error;
@@ -82,10 +78,10 @@ const getBoardsWithPagination = async (page, pageSize) => {
   }
 };
 
-// 🟢 Search posts
-const searchPosts = async (searchTerm) => {
+// 🟢 Search posts (mặc định ẩn pending)
+const searchPosts = async (searchTerm, includePending = false) => {
   try {
-    const results = await boardModel.searchPosts(searchTerm);
+    const results = await boardModel.searchPosts(searchTerm, { includePending });
     return results;
   } catch (error) {
     throw new ApiError(
@@ -99,11 +95,9 @@ const searchPosts = async (searchTerm) => {
 const deletePost = async (postId) => {
   try {
     const result = await boardModel.deletePost(postId);
-
     if (result.deletedCount === 0) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete post failed');
     }
-
     return { message: 'Delete post successfully!' };
   } catch (error) {
     if (error instanceof ApiError) throw error;
@@ -128,9 +122,7 @@ const toggleLike = async (postId, userId) => {
     let updatedLikes;
     if (likes.some((id) => id.toString() === userObjId.toString())) {
       // unlike
-      updatedLikes = likes.filter(
-        (id) => id.toString() !== userObjId.toString()
-      );
+      updatedLikes = likes.filter((id) => id.toString() !== userObjId.toString());
     } else {
       // like
       updatedLikes = [...likes, userObjId];
@@ -138,12 +130,12 @@ const toggleLike = async (postId, userId) => {
 
     const updatedBoard = await boardModel.updateOneById(postId, {
       likes: updatedLikes,
-      updatedAt: new Date(),
+      updatedAt: new Date()
     });
 
     return {
       ...updatedBoard,
-      likesCount: updatedLikes.length,
+      likesCount: updatedLikes.length
     };
   } catch (error) {
     if (error instanceof ApiError) throw error;
@@ -154,13 +146,14 @@ const toggleLike = async (postId, userId) => {
   }
 };
 
-// 🟢 Get boards by hashtag
-const getBoardsByHashtag = async (tag, page, pageSize) => {
+// 🟢 Get boards by hashtag (mặc định ẩn pending)
+const getBoardsByHashtag = async (tag, page, pageSize, includePending = false) => {
   try {
     const { boards, totalCount } = await boardModel.getBoardsByHashtag(
       tag,
       page,
-      pageSize
+      pageSize,
+      { includePending }
     );
     return { boards, totalCount };
   } catch (error) {
@@ -171,13 +164,14 @@ const getBoardsByHashtag = async (tag, page, pageSize) => {
   }
 };
 
-// 🟢 Get boards by user
-const getBoardsByUser = async (userId, page, pageSize) => {
+// 🟢 Get boards by user (mặc định ẩn pending)
+const getBoardsByUser = async (userId, page, pageSize, includePending = false) => {
   try {
     const { boards, totalCount } = await boardModel.getBoardsByUser(
       userId,
       page,
-      pageSize
+      pageSize,
+      { includePending }
     );
     return { boards, totalCount };
   } catch (error) {
@@ -188,24 +182,58 @@ const getBoardsByUser = async (userId, page, pageSize) => {
   }
 };
 
-// 🟢 Update board
+// 🟢 Update board (nội dung/ảnh)
 const updateBoard = async (postId, updateData) => {
   try {
-    updateData.updatedAt = new Date() // model cũng set, nhưng set ở đây không sao
-
-    const updatedBoard = await boardModel.updateBoard(postId, updateData)
+    updateData.updatedAt = new Date(); // model cũng set, nhưng set ở đây không sao
+    const updatedBoard = await boardModel.updateBoard(postId, updateData);
     if (!updatedBoard) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found to update')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found to update');
     }
-    return updatedBoard
+    return updatedBoard;
   } catch (error) {
-    if (error instanceof ApiError) throw error
+    if (error instanceof ApiError) throw error;
     throw new ApiError(
       StatusCodes.INTERNAL_SERVER_ERROR,
       'Error while updating board: ' + error.message
-    )
+    );
   }
-}
+};
+
+/* 🆕 KIỂM DUYỆT */
+// Duyệt bài: đặt isPending=false
+const approve = async (postId) => {
+  try {
+    const updated = await boardModel.approveBoard(postId);
+    if (!updated) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found to approve');
+    }
+    return updated;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Error while approving board: ' + error.message
+    );
+  }
+};
+
+// Đặt trạng thái pending tuỳ ý
+const setPendingStatus = async (postId, isPending) => {
+  try {
+    const updated = await boardModel.setPendingStatus(postId, isPending);
+    if (!updated) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found to set pending');
+    }
+    return updated;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Error while setting pending: ' + error.message
+    );
+  }
+};
 
 export const boardService = {
   createNew,
@@ -217,5 +245,8 @@ export const boardService = {
   toggleLike,
   getBoardsByHashtag,
   getBoardsByUser,
-  updateBoard
+  updateBoard,
+  // kiểm duyệt
+  approve,
+  setPendingStatus
 };

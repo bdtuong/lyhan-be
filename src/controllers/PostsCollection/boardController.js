@@ -6,6 +6,12 @@ import { AuthModel } from "~/models/AuthModel.js"
 import Joi from "joi"
 import { v2 as cloudinary } from "cloudinary"
 
+const parseBool = (v, defaultVal = false) => {
+  if (typeof v === "boolean") return v
+  if (typeof v === "string") return v.toLowerCase() === "true"
+  return defaultVal
+}
+
 const createNew = async (req, res, next) => {
   try {
     let imageUrls = []
@@ -20,7 +26,8 @@ const createNew = async (req, res, next) => {
 
     const createdBoard = await boardService.createNew({
       ...req.body,
-      images: imageUrls, // 🆕 nhiều ảnh
+      images: imageUrls // nhiều ảnh
+      // isPending mặc định true ở schema, không cần gửi từ FE
     })
 
     res.status(StatusCodes.CREATED).json(createdBoard)
@@ -32,7 +39,8 @@ const createNew = async (req, res, next) => {
 const getDetails = async (req, res, next) => {
   try {
     const boardId = req.params.id
-    const board = await boardService.getDetails(boardId)
+    const includePending = parseBool(req.query.includePending, false)
+    const board = await boardService.getDetails(boardId, includePending)
     res.status(StatusCodes.OK).json(board)
   } catch (error) {
     next(error)
@@ -62,10 +70,11 @@ const getSharedPostsDetails = async (req, res, next) => {
     const { sharedPosts, totalCount } =
       await AuthModel.getSharedPostsWithPagination(userId, page, pageSize)
 
+    // Mặc định KHÔNG include pending
     const posts = await Promise.all(
       sharedPosts.map(async (boardId) => {
         try {
-          const board = await boardService.getDetails(boardId.toString())
+          const board = await boardService.getDetails(boardId.toString(), false)
           return board && board._id ? board : { _id: boardId }
         } catch (error) {
           console.error(`Error fetching board details for ID ${boardId}:`, error)
@@ -80,7 +89,7 @@ const getSharedPostsDetails = async (req, res, next) => {
       posts,
       currentPage: page,
       totalPages,
-      totalCount,
+      totalCount
     })
   } catch (error) {
     next(error)
@@ -109,10 +118,11 @@ const getSavedPostsDetails = async (req, res, next) => {
     const { savedPosts, totalCount } =
       await AuthModel.getSavedPostsWithPagination(userId, page, pageSize)
 
+    // Mặc định KHÔNG include pending
     const posts = await Promise.all(
       savedPosts.map(async (boardId) => {
         try {
-          const board = await boardService.getDetails(boardId.toString())
+          const board = await boardService.getDetails(boardId.toString(), false)
           return board && board._id ? board : { _id: boardId, deleted: true }
         } catch (error) {
           console.error(`Error fetching board details for ID ${boardId}:`, error)
@@ -127,7 +137,7 @@ const getSavedPostsDetails = async (req, res, next) => {
       posts,
       currentPage: page,
       totalPages,
-      totalCount,
+      totalCount
     })
   } catch (error) {
     next(error)
@@ -138,10 +148,12 @@ const getBoards = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1
     const pageSize = 9
+    const includePending = parseBool(req.query.includePending, false)
 
     const { boards, totalCount } = await boardService.getBoardsWithPagination(
       page,
-      pageSize
+      pageSize,
+      includePending
     )
 
     const totalPages = Math.ceil(totalCount / pageSize)
@@ -150,12 +162,12 @@ const getBoards = async (req, res) => {
       boards,
       currentPage: page,
       totalPages,
-      totalCount,
+      totalCount
     })
   } catch (error) {
     console.error(error)
     res.status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: error.message || "An error occurred",
+      message: error.message || "An error occurred"
     })
   }
 }
@@ -163,8 +175,10 @@ const getBoards = async (req, res) => {
 const searchPosts = async (req, res, next) => {
   try {
     const { q: searchTerm } = req.query
+    const includePending = parseBool(req.query.includePending, false)
+
     const { error } = Joi.object({
-      q: Joi.string().required().min(0).max(50),
+      q: Joi.string().required().min(0).max(50)
     }).validate(req.query)
 
     if (error) {
@@ -173,7 +187,7 @@ const searchPosts = async (req, res, next) => {
       )
     }
 
-    const results = await boardService.searchPosts(searchTerm)
+    const results = await boardService.searchPosts(searchTerm, includePending)
     res.status(StatusCodes.OK).json(results)
   } catch (error) {
     next(error)
@@ -223,6 +237,7 @@ const getBoardsByHashtag = async (req, res, next) => {
     const { tag } = req.query
     const page = parseInt(req.query.page) || 1
     const pageSize = parseInt(req.query.pageSize) || 9
+    const includePending = parseBool(req.query.includePending, false)
 
     if (!tag) {
       return next(new ApiError(StatusCodes.BAD_REQUEST, "Hashtag is required"))
@@ -231,7 +246,8 @@ const getBoardsByHashtag = async (req, res, next) => {
     const { boards, totalCount } = await boardService.getBoardsByHashtag(
       tag,
       page,
-      pageSize
+      pageSize,
+      includePending
     )
     const totalPages = Math.ceil(totalCount / pageSize)
 
@@ -239,7 +255,7 @@ const getBoardsByHashtag = async (req, res, next) => {
       boards,
       currentPage: page,
       totalPages,
-      totalCount,
+      totalCount
     })
   } catch (error) {
     next(error)
@@ -252,11 +268,13 @@ const getBoardsByUser = async (req, res, next) => {
     const { userId } = req.params
     const page = parseInt(req.query.page) || 1
     const pageSize = parseInt(req.query.pageSize) || 9
+    const includePending = parseBool(req.query.includePending, false)
 
     const { boards, totalCount } = await boardService.getBoardsByUser(
       userId,
       page,
-      pageSize
+      pageSize,
+      includePending
     )
     const totalPages = Math.ceil(totalCount / pageSize)
 
@@ -264,20 +282,19 @@ const getBoardsByUser = async (req, res, next) => {
       boards,
       currentPage: page,
       totalPages,
-      totalCount,
+      totalCount
     })
   } catch (error) {
     next(error)
   }
 }
 
-/* 🆕 Update board */
+/* 🆕 Update board (nội dung/ảnh) */
 const updateBoard = async (req, res, next) => {
   try {
     const { postId } = req.params
     let imageUrls = []
 
-    // Nếu có file mới thì upload lên Cloudinary
     if (req.files && req.files.length > 0) {
       const uploadPromises = req.files.map((file) =>
         cloudinary.uploader.upload(file.path, { folder: "boards" })
@@ -287,10 +304,13 @@ const updateBoard = async (req, res, next) => {
     }
 
     const updateData = {
-      content: req.body.content || "",
-      ...(imageUrls.length > 0 ? { images: imageUrls } : {}), // chỉ thay đổi nếu có ảnh mới
-      updatedAt: new Date(),
+      content: typeof req.body.content === "string" ? req.body.content : undefined,
+      ...(imageUrls.length > 0 ? { images: imageUrls } : {}),
+      updatedAt: new Date()
     }
+
+    // lọc bỏ field undefined để tránh xoá nhầm
+    Object.keys(updateData).forEach((k) => updateData[k] === undefined && delete updateData[k])
 
     const updatedBoard = await boardService.updateBoard(postId, updateData)
     if (!updatedBoard) {
@@ -304,6 +324,38 @@ const updateBoard = async (req, res, next) => {
   }
 }
 
+/* 🆕 Approve bài (đặt isPending=false) */
+const approve = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const updated = await boardService.approve(id)
+    if (!updated) {
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "Không tìm thấy bài viết" })
+    }
+    res.status(StatusCodes.OK).json(updated)
+  } catch (error) {
+    next(error)
+  }
+}
+
+/* 🆕 Đặt trạng thái pending tuỳ ý */
+const setPending = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const schema = Joi.object({ isPending: Joi.boolean().required() })
+    const { error, value } = schema.validate(req.body)
+    if (error) {
+      return next(new ApiError(StatusCodes.BAD_REQUEST, error.details[0].message))
+    }
+    const updated = await boardService.setPendingStatus(id, value.isPending)
+    if (!updated) {
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "Không tìm thấy bài viết" })
+    }
+    res.status(StatusCodes.OK).json(updated)
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const boardController = {
   createNew,
@@ -319,5 +371,8 @@ export const boardController = {
   toggleLike,
   getBoardsByHashtag,
   getBoardsByUser,
-  updateBoard, // 🆕 export thêm
+  updateBoard,
+  // mới thêm cho kiểm duyệt
+  approve,
+  setPending
 }
