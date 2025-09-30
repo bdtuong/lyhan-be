@@ -61,6 +61,7 @@ const START_SERVER = () => {
 
   // Route nhẹ để UptimeRobot ping giữ server "tỉnh"
   app.get('/keepalive', (_req, res) => {
+    console.log("🐣 PING /keepalive");
     res.status(200).send('Backend is alive!');
   });
 
