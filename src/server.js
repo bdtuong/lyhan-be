@@ -66,6 +66,12 @@ const START_SERVER = () => {
   app.use('/v1', APIs_V1);
   app.use(errorHandlingMiddleware);
 
+  // Route nhẹ để UptimeRobot ping giữ server "tỉnh"
+  app.get('/keepalive', (_req, res) => {
+    res.status(200).send('Backend is alive!');
+  });
+
+
   // ==== 🔧 Quan trọng cho Render: dùng process.env.PORT và 0.0.0.0 ====
   const PORT = process.env.PORT || env.APP_PORT || 3000;
   const HOST = '0.0.0.0';
