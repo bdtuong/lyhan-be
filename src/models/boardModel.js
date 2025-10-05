@@ -4,7 +4,6 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators.js';
 import { GET_DB } from '~/config/mongodb.js';
 import { CommentModel } from './commentModel.js';
 import { CommentInlineModel } from './commentInlineModel.js';
-import { AuthModel } from '~/models/AuthModel.js';
 
 // Collection name
 const BOARD_COLLECTION_NAME = 'boards';
@@ -51,16 +50,17 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   language: Joi.string().required().trim(),
   content: Joi.string().required(),
 
-  // nhiều ảnh thay vì 1
   images: Joi.array().items(Joi.string().uri()).default([]),
 
-  // mảng likes
-  likes: Joi.array().items(Joi.object()).default([]),
+  // 🆕 Thêm field video (dạng object)
+  video: Joi.object({
+    url: Joi.string().uri().required(),
+    public_id: Joi.string().required()
+  }).optional(),
 
-  // mảng hashtags
+  likes: Joi.array().items(Joi.object()).default([]),
   hashtags: Joi.array().items(Joi.string()).default([]),
 
-  // ✅ Cờ kiểm duyệt: true = đang chờ admin duyệt, false = đã duyệt hiển thị công khai
   isPending: Joi.boolean().default(true),
 
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
@@ -114,10 +114,10 @@ const createNew = async (data) => {
   }
 };
 
-// Find by ID (KHÔNG lọc isPending ở đây vì dùng cho trang chi tiết nội bộ; trang public nên dùng getDetails)
+// Find by ID
 const findOneById = async (id) => {
   try {
-    if (!isValidObjectId(id)) return null; // ✅ chặn BSONError
+    if (!isValidObjectId(id)) return null;
     return await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
       .findOne({ _id: new ObjectId(id) });
@@ -131,7 +131,6 @@ const updateOneById = async (id, updateData) => {
   try {
     if (!isValidObjectId(id)) return null;
 
-    // alias ispending -> isPending nếu có
     if (typeof updateData.isPending === 'undefined' && typeof updateData.ispending !== 'undefined') {
       updateData.isPending = Boolean(updateData.ispending);
       delete updateData.ispending;
@@ -151,10 +150,10 @@ const updateOneById = async (id, updateData) => {
   }
 };
 
-// Get details with comments + commentsCount (mặc định CHỈ trả bài đã duyệt)
+// Get details
 const getDetails = async (id, options = { includePending: false }) => {
   try {
-    if (!isValidObjectId(id)) return null; // ✅ chặn BSONError
+    if (!isValidObjectId(id)) return null;
 
     const matchStage = {
       _id: new ObjectId(id),
@@ -221,7 +220,7 @@ const updateUserShare = async (boardId, userId) => {
   }
 };
 
-// Pagination (mặc định ẩn pending; truyền { includePending: true } để hiện cả pending, dùng cho admin)
+// Pagination
 const getBoardsWithPagination = async (page, pageSize, options = { includePending: false }) => {
   try {
     const skip = (page - 1) * pageSize;
@@ -266,14 +265,12 @@ const getBoardsWithPagination = async (page, pageSize, options = { includePendin
   }
 };
 
-// Search (mặc định ẩn pending)
-// Search (mặc định ẩn pending) — CHỈ tìm theo post, không join user
+// Search
 const searchPosts = async (searchTerm, options = { includePending: false }) => {
   try {
     const term = String(searchTerm || "").trim();
     if (!term) return [];
 
-    // regex i/Unicode: tìm trong tiêu đề, mô tả, nội dung, hashtag
     const regex = new RegExp(term, "i");
     const hashtagOrs = [{ hashtags: { $regex: regex } }];
     if (!term.startsWith("#")) {
@@ -285,8 +282,8 @@ const searchPosts = async (searchTerm, options = { includePending: false }) => {
       ...(options?.includePending ? {} : { isPending: false }),
       $or: [
         { title: { $regex: regex } },
-        { description: { $regex: regex } },  // 👈 thêm description
-        { content: { $regex: regex } },      // 👈 thêm content
+        { description: { $regex: regex } },
+        { content: { $regex: regex } },
         ...hashtagOrs
       ]
     };
@@ -300,8 +297,7 @@ const searchPosts = async (searchTerm, options = { includePending: false }) => {
           $addFields: {
             likesCount: { $size: { $ifNull: ["$likes", []] } }
           }
-        },
-        // Không cần $lookup userInfo nữa
+        }
       ])
       .toArray();
 
@@ -311,8 +307,7 @@ const searchPosts = async (searchTerm, options = { includePending: false }) => {
   }
 };
 
-
-// Get boards by hashtag (mặc định ẩn pending)
+// Get boards by hashtag
 const getBoardsByHashtag = async (tag, page, pageSize, options = { includePending: false }) => {
   try {
     const skip = (page - 1) * pageSize;
@@ -359,7 +354,7 @@ const getBoardsByHashtag = async (tag, page, pageSize, options = { includePendin
   }
 };
 
-// 🆕 Get boards by userId (mặc định ẩn pending)
+// Get boards by user
 const getBoardsByUser = async (userId, page = 1, pageSize = 9, options = { includePending: false }) => {
   try {
     if (!isValidObjectId(userId)) return { boards: [], totalCount: 0 };
@@ -424,17 +419,16 @@ const deletePost = async (postId) => {
   }
 };
 
+// ✅ Update board (bao gồm cập nhật video)
 const updateBoard = async (postId, updateData) => {
   try {
     if (!isValidObjectId(postId)) return null;
 
-    // alias ispending -> isPending nếu có
     if (typeof updateData.isPending === 'undefined' && typeof updateData.ispending !== 'undefined') {
       updateData.isPending = Boolean(updateData.ispending);
       delete updateData.ispending;
     }
 
-    // Nếu có content mới thì parse lại hashtags
     if (updateData.content) {
       updateData.hashtags = extractHashtags(updateData.content);
     }
@@ -455,12 +449,10 @@ const updateBoard = async (postId, updateData) => {
   }
 };
 
-// ✅ Tiện ích duyệt bài: chuyển isPending=false
 const approveBoard = async (postId) => {
   return updateBoard(postId, { isPending: false });
 };
 
-// ✅ Tiện ích đặt trạng thái pending tuỳ ý (ví dụ hoàn/bỏ duyệt)
 const setPendingStatus = async (postId, isPending) => {
   return updateBoard(postId, { isPending: Boolean(isPending) });
 };
@@ -479,6 +471,6 @@ export const boardModel = {
   getBoardsByHashtag,
   getBoardsByUser,
   updateBoard,
-  approveBoard,      // 🆕
-  setPendingStatus,  // 🆕
+  approveBoard,
+  setPendingStatus,
 };

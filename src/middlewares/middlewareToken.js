@@ -14,39 +14,41 @@ const getTokenFromReq = (req) => {
 }
 
 const middlewareToken = {
-  verifyToken: (req, res, next) => {
-    try {
-      const token = getTokenFromReq(req)
-      if (!token) {
-        return res
-          .status(StatusCodes.UNAUTHORIZED)
-          .json({ message: 'Access token is required to access this resource.' })
-      }
-
-      jwt.verify(token, env.JWT_ACCESS_TOKEN_SECRET, async (err, decoded) => {
-        if (err) {
-          return res
-            .status(StatusCodes.UNAUTHORIZED)
-            .json({ message: 'Invalid or expired token.' })
-        }
-
-        // Token của bạn có thể lưu userId hoặc id/_id — bắt hết các trường hợp
-        const userId = decoded.userId || decoded.id || decoded._id
-        const user = userId ? await AuthModel.findOneById(userId) : null
-        if (!user) {
-          return res
-            .status(StatusCodes.UNAUTHORIZED)
-            .json({ message: 'User does not exist or is inactive.' })
-        }
-
-        // Gắn vào req để route/controller dùng tiếp
-        req.user = { ...user, _id: user._id?.toString?.() ?? user._id }
-        next()
-      })
-    } catch (error) {
-      next(error)
+  verifyToken: async (req, res, next) => {
+  try {
+    const token = getTokenFromReq(req)
+    if (!token) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: 'Access token is required to access this resource.' })
     }
-  },
+
+    // 👉 Dùng sync thay vì callback async
+    const decoded = jwt.verify(token, env.JWT_ACCESS_TOKEN_SECRET)
+
+    // ✅ Debug kỹ
+    console.log("🧩 decoded:", decoded)
+
+    const userId = decoded.userId || decoded.id || decoded._id
+    const user = userId ? await AuthModel.findOneById(userId) : null
+
+    console.log("👤 user:", user)
+
+    if (!user) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: 'User does not exist or is inactive.' })
+    }
+
+    req.user = { ...user, _id: user._id?.toString?.() ?? user._id }
+    next()
+  } catch (error) {
+    return res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ message: 'Invalid or expired token.' })
+  }
+},
+
 
   // Cho phép: chủ sở hữu (params.id) hoặc admin
   verifyTokenAndAdminAuth: (req, res, next) => {

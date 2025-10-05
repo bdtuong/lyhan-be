@@ -10,7 +10,7 @@ const Router = express.Router();
 Router.route('/')
   .get(boardController.getBoards)
   .post(
-    upload.array('images', 5),
+    upload.array('files'), // ✅ hỗ trợ ảnh & video
     boardValidation.createNew,
     boardController.createNew
   );
@@ -42,12 +42,12 @@ Router.route('/delete-savedpost/:userId/:postId').put(boardController.deleteSave
 // 🟢 Xoá post thật sự
 Router.route('/delete-post/:postId').delete(boardController.deletePost);
 
-// 🟢 Toggle like/unlike (để dưới cùng trước getDetails)
+// 🟢 Toggle like/unlike
 Router.route('/:id/like').post(boardController.toggleLike);
 
-// 🟢 Update post (content/images)
+// 🟢 Update post (content/images/video)
 Router.route('/update-post/:postId').put(
-  upload.array('images', 5),
+  upload.array('files'), // ✅ hỗ trợ ảnh & video khi update
   boardController.updateBoard
 );
 
@@ -64,7 +64,7 @@ Router.route('/:id/pending').patch(
   boardController.setPending
 );
 
-// 🟢 Lấy chi tiết board theo id (⚠️ để CUỐI CÙNG, hỗ trợ ?includePending=)
+// 🟢 Lấy chi tiết board theo id (?includePending=)
 Router.route('/:id').get(boardController.getDetails);
 
 export const boardRoute = Router;

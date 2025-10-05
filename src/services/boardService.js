@@ -8,9 +8,9 @@ const createNew = async (reqBody) => {
   try {
     const objectId = {
       ...reqBody,
-      userID: new ObjectId(reqBody.userId), // đồng bộ field userID để join sang AuthModel
-      images: reqBody.images || []          // đảm bảo luôn có mảng images
-      // isPending mặc định true ở schema (model)
+      userID: new ObjectId(reqBody.userId),
+      images: reqBody.images || [],
+      video: reqBody.video || null // ✅ thêm để lưu video nếu có
     };
 
     const createdBoard = await boardModel.createNew(objectId);
@@ -22,6 +22,7 @@ const createNew = async (reqBody) => {
     );
   }
 };
+
 
 // 🟢 Lấy chi tiết board theo id (mặc định ẩn pending)
 const getDetails = async (boardId, includePending = false) => {
