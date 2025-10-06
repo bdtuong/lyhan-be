@@ -188,6 +188,49 @@ const changeUsername = async (userId, username) => {
   }
 };
 
+const findOrCreateGoogleUser = async (profile) => {
+  try {
+    const email = profile.emails?.[0]?.value || `no-email-${profile.id}@google.com`;
+    const displayName = profile.displayName || "Unnamed";
+    const googleId = profile.id;
+
+    // 1. Ưu tiên tìm theo email
+    let user = await AuthModel.findOne({ email });
+
+    // 2. Nếu đã tồn tại nhưng chưa lưu googleId, cập nhật thêm
+    if (user && !user.googleId) {
+      await AuthModel.updateOne(
+        { _id: user._id },
+        { $set: { googleId } }
+      );
+      user.googleId = googleId;
+      return user;
+    }
+
+    // 3. Nếu chưa tồn tại, tạo user mới
+    if (!user) {
+      const fakePassword = await bcrypt.hash(Date.now().toString(), 10);
+      const newUser = {
+        username: displayName,
+        email,
+        googleId,
+        password: fakePassword, // Hash giả để tránh bỏ trống
+        slug: slugify(displayName),
+        avatar: [profile.photos?.[0]?.value || ""],
+      };
+
+      const created = await AuthModel.createNew(newUser);
+      user = await AuthModel.findOneById(created.insertedId);
+    }
+
+    return user;
+  } catch (error) {
+    throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.message);
+  }
+};
+
+
+
 export const AuthService = {
   createNew,
   getDetails,
@@ -196,4 +239,5 @@ export const AuthService = {
   generateResetPasswordToken,
   resetPassword,
   changeUsername,
+  findOrCreateGoogleUser,
 };

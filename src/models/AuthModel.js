@@ -10,8 +10,12 @@ const USER_COLLECTION_NAME = 'Users';
 const USER_COLLECTION_SCHEMA = Joi.object({
   username: Joi.string().required().min(6).max(15).trim().strict(),
   email: Joi.string().required().email().trim().strict(),
-  password: Joi.string().required().min(8).trim().strict(),
-  confirmPassword: Joi.string().required().valid(Joi.ref('password')).strict(),
+  password: Joi.string().min(8).trim().strict().allow('', null),
+  confirmPassword: Joi.string()
+    .valid(Joi.ref('password'))
+    .strict()
+    .allow('', null),
+
   sharedPosts: Joi.array()
     .items(Joi.string().pattern(OBJECT_ID_RULE))
     .default([]),
@@ -33,6 +37,8 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   resetPasswordExpires: Joi.date().timestamp('javascript').default(null),
 
   _destroy: Joi.boolean().default(false),
+  googleId: Joi.string().optional(), // <-- thêm dòng này
+
 });
 
 const validateBeforeCreate = async data => {
@@ -322,6 +328,17 @@ const deleteSavedPost = async (userId, postId) => {
     throw new Error(error);
   }
 }
+
+const findOneByGoogleId = async (googleId) => {
+  try {
+    return await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .findOne({ googleId });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 
 export const AuthModel = {
   USER_COLLECTION_NAME,

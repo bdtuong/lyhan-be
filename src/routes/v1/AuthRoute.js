@@ -2,7 +2,21 @@ import express from 'express';
 import { AuthValidation } from '~/validations/AuthValidation.js';
 import { AuthController } from '~/controllers/UsersCollection/AuthController.js';
 import { middlewareToken } from '~/middlewares/middlewareToken.js';
+import passport from 'passport';
+
 const Router1 = express.Router();
+
+// ✅ THÊM ROUTE GOOGLE LOGIN
+Router1.get(
+  '/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+Router1.get(
+  '/google/callback',
+  passport.authenticate('google', { session: false }),
+  AuthController.googleCallback
+);
 
 Router1.route('/').post(AuthValidation.createNew, AuthController.createNew);
 
@@ -34,5 +48,7 @@ Router1.route('/avatar/:userId').put(
 Router1.route('/get-avatar/:userId').get(AuthController.getAvatar);
 
 Router1.route('/delete-sharedpost/:userId/:postId').put(AuthController.deleteSharedPost);
+
+
 
 export const AuthRoute = Router1;

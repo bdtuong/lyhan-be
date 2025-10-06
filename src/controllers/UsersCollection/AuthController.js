@@ -295,6 +295,30 @@ const deleteSharedPost = async (req, res, next) => {
   }
 };
 
+const googleCallback = async (req, res, next) => {
+  try {
+    const user = req.user; // Được gán bởi passport.authenticate()
+
+    const access_token = jwt.sign(
+      {
+        id: user._id,
+        admin: user.admin
+      },
+      env.JWT_ACCESS_TOKEN_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    // 👉 Cách 1: Redirect về frontend kèm token (phổ biến)
+    res.redirect(`${env.FRONTEND_URL}/auth-success?token=${access_token}`);
+
+    // 👉 Cách 2: Trả JSON cho SPA (nếu không redirect)
+    // res.status(StatusCodes.OK).json({ access_token });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 export const AuthController = {
   createNew,
   getDetails,
@@ -307,5 +331,6 @@ export const AuthController = {
   updateAvatar,
   handleAvatarUpload,
   getAvatar,
-  deleteSharedPost
+  deleteSharedPost,
+  googleCallback
 };

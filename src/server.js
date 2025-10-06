@@ -14,7 +14,7 @@ import http from 'http';
 import { ObjectId } from 'mongodb';
 import { WHITELIST_DOMAINS } from '~/utils/constant.js';
 import { AuthModel } from './models/AuthModel.js';
-
+import './passport/google.strategy.js';
 const START_SERVER = () => {
   const app = express();
   const server = http.createServer(app);
@@ -71,9 +71,6 @@ const START_SERVER = () => {
   app.use(express.json());
   app.use('/v1', APIs_V1);
   app.use(errorHandlingMiddleware);
-
-  
-
 
   // ==== 🔧 Quan trọng cho Render: dùng process.env.PORT và 0.0.0.0 ====
   const PORT = process.env.PORT || env.APP_PORT || 3000;
