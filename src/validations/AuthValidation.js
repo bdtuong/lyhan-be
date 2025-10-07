@@ -6,11 +6,11 @@ import { OBJECT_ID_RULE } from '~/utils/validators.js';
 
 const createNew = async (req, res, next) => {
   const correctCondition = Joi.object({
-    username: Joi.string().required().min(6).max(15).trim().strict().messages({
+    username: Joi.string().required().min(6).max(50).trim().strict().messages({
       'any.required': 'Username is required',
       'string.empty': 'Username is not allowed to be empty',
       'string.min': 'Username must be at least 6 characters long',
-      'string.max': 'Username must be at most 15 characters long',
+      'string.max': 'Username must be at most 50 characters long',
       'string.trim': 'Username must not have leading or trailing whitespace',
     }),
     email: Joi.string().required().email().trim().strict().messages({
